@@ -1,0 +1,25 @@
+FROM --platform=$BUILDPLATFORM golang:1.21@sha256:672a2286da3ee7a854c3e0a56e0838918d0dbb1c18652992930293312de898a6 as build
+
+ARG TARGETOS
+ARG TARGETARCH
+
+ADD . /src
+WORKDIR /src
+
+RUN make build
+
+FROM alpine:3.19@sha256:51b67269f354137895d43f3b3d810bfacd3945438e94dc5ac55fdac340352f48
+
+LABEL maintainer="Robert Kaussow <mail@thegeeklab.de>"
+LABEL org.opencontainers.image.authors="Robert Kaussow <mail@thegeeklab.de>"
+LABEL org.opencontainers.image.title="wp-git-clone"
+LABEL org.opencontainers.image.url="https://github.com/thegeeklab/wp-git-clone"
+LABEL org.opencontainers.image.source="https://github.com/thegeeklab/wp-git-clone"
+LABEL org.opencontainers.image.documentation="https://github.com/thegeeklab/wp-git-clone"
+
+RUN apk --update add --no-cache git openssh curl git-lfs && \
+    rm -rf /var/cache/apk/* && \
+    rm -rf /tmp/*
+
+COPY --from=build /src/dist/wp-git-clone /bin/wp-git-clone
+ENTRYPOINT [ "/bin/wp-git-clone" ]

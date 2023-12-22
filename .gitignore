@@ -1,0 +1,7 @@
+/dist
+/release
+/wp-git-clone*
+docs/data/data-raw.yaml
+
+coverage.out
+CHANGELOG.md

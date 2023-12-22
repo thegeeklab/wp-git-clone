@@ -1,0 +1,56 @@
+// Copyright (c) 2023, Robert Kaussow <mail@thegeeklab.de>
+
+// Use of this source code is governed by an Apache 2.0 license that can be
+// found in the LICENSE file.
+
+package plugin
+
+import (
+	"github.com/thegeeklab/wp-git-clone/git"
+	wp "github.com/thegeeklab/wp-plugin-go/plugin"
+)
+
+// Plugin implements provide the plugin.
+type Plugin struct {
+	*wp.Plugin
+	Settings *Settings
+}
+
+type Pipeline struct {
+	Event  string
+	Number int
+}
+
+type Netrc struct {
+	Machine  string
+	Login    string
+	Password string
+}
+
+// Settings for the plugin.
+type Settings struct {
+	Depth     int
+	Recursive bool
+	Tags      bool
+	Lfs       bool
+	Partial   bool
+	Filter    string
+	UseSSH    bool
+	SSHKey    string
+	WorkDir   string
+
+	Pipeline Pipeline
+	Netrc    Netrc
+	Repo     git.Repository
+}
+
+func New(options wp.Options, settings *Settings) *Plugin {
+	p := &Plugin{}
+
+	options.Execute = p.run
+
+	p.Plugin = wp.New(options)
+	p.Settings = settings
+
+	return p
+}
