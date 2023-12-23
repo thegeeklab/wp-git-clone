@@ -36,10 +36,12 @@ properties:
       Clone depth.
     defaultvalue: 0
 
-  - name: insecure_ssl_verify
+  - name: insecure_skip_ssl_verify
     description: |
-      Set SSL verification of the remote machine.
-    defaultvalue: false
+      Skip SSL verification of the remote machine. Activating this option is insecure
+      and should be avoided in most cases.
+    defaultvalue: true
+    type: bool
 
   - name: lfs
     description: |
