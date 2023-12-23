@@ -16,10 +16,6 @@ type Plugin struct {
 	Settings *Settings
 }
 
-type Pipeline struct {
-	Event string
-}
-
 type Netrc struct {
 	Machine  string
 	Login    string
@@ -39,9 +35,8 @@ type Settings struct {
 	Home      string
 	WorkDir   string
 
-	Pipeline Pipeline
-	Netrc    Netrc
-	Repo     git.Repository
+	Netrc Netrc
+	Repo  git.Repository
 }
 
 func New(options wp.Options, settings *Settings) *Plugin {

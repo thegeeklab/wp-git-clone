@@ -59,19 +59,6 @@ func (p *Plugin) Validate() error {
 		}
 	}
 
-	if p.Settings.Pipeline.Event == "tag" && !p.Settings.Tags {
-		// tags clone not explicit set but pipeline is triggered by a tag
-		// auto set tags cloning to true
-		p.Settings.Tags = true
-	}
-
-	if p.Settings.Tags && p.Settings.Partial {
-		log.Warn().Msg("ignore partial clone as tags are fetched")
-
-		// if tag fetching is enabled per event or setting, disable partial clone
-		p.Settings.Partial = false
-	}
-
 	if p.Settings.Partial {
 		p.Settings.Depth = 1
 		p.Settings.Filter = "tree:0"

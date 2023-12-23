@@ -12,7 +12,6 @@ type testCommit struct {
 	name      string
 	path      string
 	clone     string
-	event     string
 	commit    string
 	ref       string
 	file      string
@@ -36,9 +35,6 @@ func TestClone(t *testing.T) {
 					CommitRef: tt.ref,
 					CommitSha: tt.commit,
 					Branch:    "main",
-				},
-				Pipeline: Pipeline{
-					Event: tt.event,
 				},
 				Home:      "/tmp",
 				WorkDir:   filepath.Join(dir, tt.path),
@@ -82,9 +78,6 @@ func TestCloneNonEmpty(t *testing.T) {
 					CommitRef: tt.ref,
 					CommitSha: tt.commit,
 					Branch:    "main",
-				},
-				Pipeline: Pipeline{
-					Event: tt.event,
 				},
 				Home:      "/tmp",
 				WorkDir:   filepath.Join(dir, tt.path),
@@ -150,7 +143,6 @@ func getCommits() []testCommit {
 			name:   "first commit",
 			path:   "octocat/Hello-World",
 			clone:  "https://github.com/octocat/Hello-World.git",
-			event:  "push",
 			commit: "553c2077f0edc3d5dc5d17262f6aa498e69d6f8e",
 			ref:    "refs/heads/master",
 			file:   "README",
@@ -160,7 +152,6 @@ func getCommits() []testCommit {
 			name:   "head commit",
 			path:   "octocat/Hello-World",
 			clone:  "https://github.com/octocat/Hello-World.git",
-			event:  "push",
 			commit: "7fd1a60b01f91b314f59955a4e4d4e80d8edf11d",
 			ref:    "refs/heads/master",
 			file:   "README",
@@ -170,7 +161,6 @@ func getCommits() []testCommit {
 			name:   "pull request commit",
 			path:   "octocat/Hello-World",
 			clone:  "https://github.com/octocat/Hello-World.git",
-			event:  "pull_request",
 			commit: "762941318ee16e59dabbacb1b4049eec22f0d303",
 			ref:    "refs/pull/6/merge",
 			file:   "README",
@@ -180,7 +170,6 @@ func getCommits() []testCommit {
 			name:   "branch",
 			path:   "octocat/Hello-World",
 			clone:  "https://github.com/octocat/Hello-World.git",
-			event:  "push",
 			commit: "b3cbd5bbd7e81436d2eee04537ea2b4c0cad4cdf",
 			ref:    "refs/heads/test",
 			file:   "CONTRIBUTING.md",
@@ -190,7 +179,6 @@ func getCommits() []testCommit {
 			name:   "tags",
 			path:   "github/mime-types",
 			clone:  "https://github.com/github/mime-types.git",
-			event:  "tag",
 			commit: "bf68d60215a167c935bc5976b7d06a7ffb290926",
 			ref:    "refs/tags/v1.17",
 			file:   ".gitignore",
@@ -200,7 +188,6 @@ func getCommits() []testCommit {
 			name:      "submodules",
 			path:      "test-assets/woodpecker-git-test-submodule",
 			clone:     "https://github.com/test-assets/woodpecker-git-test-submodule.git",
-			event:     "push",
 			commit:    "cc020eb6aaa601c13ca7b0d5db9d1ca694e7a003",
 			ref:       "refs/heads/main",
 			file:      "Hello-World/README",
@@ -211,7 +198,6 @@ func getCommits() []testCommit {
 			name:  "checkout with ref only",
 			path:  "octocat/Hello-World",
 			clone: "https://github.com/octocat/Hello-World.git",
-			event: "push",
 			// commit: "a11fb45a696bf1d696fc9ab2c733f8f123aa4cf5",
 			ref:  "pull/2403/head",
 			file: "README",
@@ -222,7 +208,6 @@ func getCommits() []testCommit {
 			name:     "checkout with lfs skip",
 			path:     "test-assets/woodpecker-git-test-lfs",
 			clone:    "https://github.com/test-assets/woodpecker-git-test-lfs.git",
-			event:    "push",
 			commit:   "69d4dadb4c2899efb73c0095bb58a6454d133cef",
 			ref:      "refs/heads/main",
 			file:     "4M.bin",
@@ -232,7 +217,6 @@ func getCommits() []testCommit {
 			name:     "checkout with lfs",
 			path:     "test-assets/woodpecker-git-test-lfs",
 			clone:    "https://github.com/test-assets/woodpecker-git-test-lfs.git",
-			event:    "push",
 			commit:   "69d4dadb4c2899efb73c0095bb58a6454d133cef",
 			ref:      "refs/heads/main",
 			file:     "4M.bin",

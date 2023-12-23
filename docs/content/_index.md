@@ -56,7 +56,6 @@ docker build --file Containerfile.multiarch --tag thegeeklab/wp-git-clone .
 ```Shell
 docker run --rm \
   -e CI_REPO_CLONE_URL=https://github.com/octocat/Hello-World.git \
-  -e CI_PIPELINE_EVENT=push \
   -e CI_COMMIT_SHA=b3cbd5bbd7e81436d2eee04537ea2b4c0cad4cdf \
   -e CI_COMMIT_REF=refs/heads/test \
   -e CI_WORKSPACE=/tmp/wp_git_testrepo \

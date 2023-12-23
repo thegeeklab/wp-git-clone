@@ -54,14 +54,6 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 			Category:    category,
 		},
 		&cli.StringFlag{
-			Name:        "event",
-			Value:       "push",
-			Usage:       "pipeline event",
-			EnvVars:     []string{"CI_PIPELINE_EVENT"},
-			Destination: &settings.Pipeline.Event,
-			Category:    category,
-		},
-		&cli.StringFlag{
 			Name:        "netrc.machine",
 			Usage:       "netrc machine",
 			EnvVars:     []string{"CI_NETRC_MACHINE"},
@@ -99,7 +91,7 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "tags",
-			Usage:       "clone tags, if not explicitly set and event is tag its default is true else false",
+			Usage:       "fetch git tags during clone",
 			EnvVars:     []string{"PLUGIN_TAGS"},
 			Destination: &settings.Tags,
 			Category:    category,

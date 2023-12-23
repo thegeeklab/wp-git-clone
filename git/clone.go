@@ -8,10 +8,10 @@ import (
 
 // FetchSource fetches the source from remote.
 func FetchSource(ref string, tags bool, depth int, filter string) *execabs.Cmd {
-	tagsOption := "--no-tags"
+	tagsOption := "--tags"
 
-	if tags {
-		tagsOption = "--tags"
+	if !tags {
+		tagsOption = "--no-tags"
 	}
 
 	args := []string{

@@ -5,23 +5,6 @@ properties:
       Change branch name.
     defaultvalue: "main"
 
-  - name: ci_netrc_machine
-    description: |
-      Netrc machine.
-
-  - name: ci_netrc_password
-    description: |
-      Netrc password.
-
-  - name: ci_netrc_username
-    description: |
-      Metrc username.
-
-  - name: ci_pipeline_event
-    description: |
-      Pipeline event.
-    defaultvalue: "push"
-
   - name: commit_ref
     description: |
       Git commit ref.
@@ -90,8 +73,8 @@ properties:
 
   - name: tags
     description: |
-      Clone tags, if not explicitly set and event is tag its default is `true` else `false`.
-    defaultvalue: false
+      Fetch git tags during clone.
+    defaultvalue: true
 
   - name: use_ssh
     description: |
