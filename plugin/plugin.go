@@ -17,8 +17,7 @@ type Plugin struct {
 }
 
 type Pipeline struct {
-	Event  string
-	Number int
+	Event string
 }
 
 type Netrc struct {
@@ -37,6 +36,7 @@ type Settings struct {
 	Filter    string
 	UseSSH    bool
 	SSHKey    string
+	Home      string
 	WorkDir   string
 
 	Pipeline Pipeline

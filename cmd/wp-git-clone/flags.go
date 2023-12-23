@@ -28,7 +28,7 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 			Name:        "remote-ssh",
 			Usage:       "git clone ssh url",
 			EnvVars:     []string{"PLUGIN_REMOTE_SSH", "CI_REPO_CLONE_SSH_URL"},
-			Destination: &settings.Repo.RemoteURL,
+			Destination: &settings.Repo.RemoteSSH,
 			Category:    category,
 		},
 		&cli.StringFlag{
@@ -105,11 +105,10 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 			Category:    category,
 		},
 		&cli.BoolFlag{
-			Name:        "insecure-ssl-verify",
-			Usage:       "set SSL verification of the remote machine",
-			EnvVars:     []string{"PLUGIN_INSECURE_SSL_VERIFY"},
-			Destination: &settings.Repo.InsecureSSLVerify,
-			Value:       false,
+			Name:        "insecure-skip-ssl-verify",
+			Usage:       "skip ssl verification of the remote machine",
+			EnvVars:     []string{"PLUGIN_INSECURE_SKIP_SSL_VERIFY"},
+			Destination: &settings.Repo.InsecureSkipSSLVerify,
 			Category:    category,
 		},
 		&cli.BoolFlag{

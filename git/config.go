@@ -11,9 +11,9 @@ import (
 func ConfigSSLVerify(repo Repository) *execabs.Cmd {
 	args := []string{
 		"config",
-		"--local",
+		"--global",
 		"http.sslVerify",
-		strconv.FormatBool(repo.InsecureSSLVerify),
+		strconv.FormatBool(!repo.InsecureSkipSSLVerify),
 	}
 
 	return execabs.Command(
@@ -26,7 +26,7 @@ func ConfigSSLVerify(repo Repository) *execabs.Cmd {
 func ConfigSafeDirectory(repo Repository) *execabs.Cmd {
 	args := []string{
 		"config",
-		"--local",
+		"--global",
 		"--replace-all",
 		"safe.directory",
 		repo.SafeDirectory,
@@ -43,7 +43,7 @@ func ConfigSafeDirectory(repo Repository) *execabs.Cmd {
 func ConfigRemapSubmodule(name, url string) *execabs.Cmd {
 	args := []string{
 		"config",
-		"--local",
+		"--global",
 		fmt.Sprintf("submodule.%s.url", name),
 		url,
 	}
@@ -58,7 +58,7 @@ func ConfigRemapSubmodule(name, url string) *execabs.Cmd {
 func ConfigSSHCommand(sshKey string) *execabs.Cmd {
 	args := []string{
 		"config",
-		"--local",
+		"--global",
 		"core.sshCommand",
 		"ssh -i " + sshKey,
 	}

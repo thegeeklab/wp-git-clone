@@ -12,7 +12,7 @@ type Repository struct {
 	SubmoduleRemote  bool
 	SubmodulePartial bool
 
-	InsecureSSLVerify bool
-	SafeDirectory     string
-	InitExists        bool
+	InsecureSkipSSLVerify bool
+	SafeDirectory         string
+	InitExists            bool
 }

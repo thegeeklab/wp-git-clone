@@ -16,7 +16,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cenkalti/backoff/v4"
 	"github.com/rs/zerolog/log"
 	"github.com/thegeeklab/wp-git-clone/git"
 	"github.com/thegeeklab/wp-plugin-go/types"
@@ -85,14 +84,6 @@ func (p *Plugin) Validate() error {
 func (p *Plugin) Execute() error {
 	cmds := make([]*execabs.Cmd, 0)
 
-	if err := os.Setenv("GIT_TERMINAL_PROMPT", "0"); err != nil {
-		return err
-	}
-	// prevents git-lfs from retrieving any LFS files
-	if err := os.Setenv("GIT_LFS_SKIP_SMUDGE", "1"); err != nil {
-		return err
-	}
-
 	// Handle init
 	initPath := filepath.Join(p.Settings.WorkDir, ".git")
 
@@ -102,6 +93,8 @@ func (p *Plugin) Execute() error {
 
 	//nolint:nestif
 	if _, err := os.Stat(initPath); os.IsNotExist(err) {
+		cmds = append(cmds, git.ConfigSafeDirectory(p.Settings.Repo))
+
 		if err := p.execCmd(git.Init(p.Settings.Repo), new(bytes.Buffer)); err != nil {
 			return err
 		}
@@ -116,7 +109,9 @@ func (p *Plugin) Execute() error {
 		}
 	}
 
-	cmds = append(cmds, git.ConfigSSLVerify(p.Settings.Repo))
+	if p.Settings.Repo.InsecureSkipSSLVerify {
+		cmds = append(cmds, git.ConfigSSLVerify(p.Settings.Repo))
+	}
 
 	if err := git.WriteNetrc(p.Settings.Netrc.Machine, p.Settings.Netrc.Login, p.Settings.Netrc.Password); err != nil {
 		return err
@@ -156,26 +151,7 @@ func (p *Plugin) Execute() error {
 
 		switch {
 		case err != nil && shouldRetry(buf.String()):
-			backoffOps := func() error {
-				// copy the original command
-				//nolint:gosec
-				retry := execabs.Command(cmd.Args[0], cmd.Args[1:]...)
-				retry.Dir = cmd.Dir
-				retry.Env = cmd.Env
-				retry.Stdout = os.Stdout
-				retry.Stderr = os.Stderr
-
-				trace(cmd)
-
-				return cmd.Run()
-			}
-			backoffLog := func(err error, delay time.Duration) {
-				log.Error().Msgf("failed to find remote ref: %v: retry in %s", err, delay.Truncate(time.Second))
-			}
-
-			if err := backoff.RetryNotify(backoffOps, newBackoff(daemonBackoffMaxRetries), backoffLog); err != nil {
-				return err
-			}
+			return retryCmd(cmd)
 		case err != nil:
 			return err
 		}
@@ -196,12 +172,23 @@ func (p *Plugin) FlagsFromContext() error {
 }
 
 func (p *Plugin) execCmd(cmd *execabs.Cmd, buf *bytes.Buffer) error {
-	cmd.Env = os.Environ()
+	// Don' set GIT_TERMINAL_PROMPT=0 as it prevents git from loading .netrc
+	defaultEnvVars := []string{
+		"GIT_LFS_SKIP_SMUDGE=1", // prevents git-lfs from retrieving any LFS files
+	}
+
+	if p.Settings.Home != "" {
+		if _, err := os.Stat(p.Settings.Home); !os.IsNotExist(err) {
+			defaultEnvVars = append(defaultEnvVars, fmt.Sprintf("HOME=%s", p.Settings.Home))
+		}
+	}
+
+	cmd.Env = append(os.Environ(), defaultEnvVars...)
 	cmd.Stdout = io.MultiWriter(os.Stdout, buf)
 	cmd.Stderr = io.MultiWriter(os.Stderr, buf)
 	cmd.Dir = p.Settings.WorkDir
 
-	fmt.Println(cmd.Dir)
+	trace(cmd)
 
 	return cmd.Run()
 }

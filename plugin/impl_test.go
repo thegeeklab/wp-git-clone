@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -41,6 +40,7 @@ func TestClone(t *testing.T) {
 				Pipeline: Pipeline{
 					Event: tt.event,
 				},
+				Home:      "/tmp",
 				WorkDir:   filepath.Join(dir, tt.path),
 				Recursive: tt.recursive,
 				Lfs:       tt.lfs,
@@ -86,13 +86,12 @@ func TestCloneNonEmpty(t *testing.T) {
 				Pipeline: Pipeline{
 					Event: tt.event,
 				},
+				Home:      "/tmp",
 				WorkDir:   filepath.Join(dir, tt.path),
 				Recursive: tt.recursive,
 				Lfs:       tt.lfs,
 			},
 		}
-
-		fmt.Println(plugin.Settings.Repo.CommitSha, tt.commit, fmt.Sprintf("%q", tt.data))
 
 		if err := plugin.Execute(); err != nil {
 			t.Errorf("Expected successful clone. Got error. %s.", err)
@@ -133,7 +132,6 @@ func teardown(dir string) {
 // helper function to read a file in the temporary worskapce.
 func readFile(dir, file string) string {
 	filename := filepath.Join(dir, file)
-	fmt.Println(filename)
 	data, _ := os.ReadFile(filename)
 
 	return string(data)
