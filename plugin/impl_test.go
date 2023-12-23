@@ -36,6 +36,7 @@ func TestClone(t *testing.T) {
 					RemoteURL: tt.clone,
 					CommitRef: tt.ref,
 					CommitSha: tt.commit,
+					Branch:    "main",
 				},
 				Pipeline: Pipeline{
 					Event: tt.event,
@@ -80,6 +81,7 @@ func TestCloneNonEmpty(t *testing.T) {
 					RemoteURL: tt.clone,
 					CommitRef: tt.ref,
 					CommitSha: tt.commit,
+					Branch:    "main",
 				},
 				Pipeline: Pipeline{
 					Event: tt.event,
