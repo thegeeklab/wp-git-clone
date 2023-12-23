@@ -1,0 +1,101 @@
+---
+properties:
+  - name: branch
+    description: |
+      Change branch name.
+    defaultvalue: "main"
+
+  - name: ci_netrc_machine
+    description: |
+      Netrc machine.
+
+  - name: ci_netrc_password
+    description: |
+      Netrc password.
+
+  - name: ci_netrc_username
+    description: |
+      Metrc username.
+
+  - name: ci_pipeline_event
+    description: |
+      Pipeline event.
+    defaultvalue: "push"
+
+  - name: commit_ref
+    description: |
+      Git commit ref.
+    defaultvalue: "refs/heads/main"
+
+  - name: commit_sha
+    description: |
+      Git commit sha.
+
+  - name: depth
+    description: |
+      Clone depth.
+    defaultvalue: 0
+
+  - name: insecure_ssl_verify
+    description: |
+      Set SSL verification of the remote machine.
+    defaultvalue: false
+
+  - name: lfs
+    description: |
+      Whether to retrieve LFS content if available.
+    defaultvalue: true
+
+  - name: partial
+    description: |
+      Enable/disable partial clone.
+    defaultvalue: false
+
+  - name: recursive
+    description: |
+      Clone submodules.
+    defaultvalue: true
+
+  - name: remote
+    description: |
+      Git remote HTTP clone url.
+
+  - name: remote_ssh
+    description: |
+      Git remote SSH clone url.
+
+  - name: safe_directory
+    description: |
+      Define/replace safe directories.
+
+  - name: ssh_key
+    description: |
+      SSH key for ssh clone.
+
+  - name: submodule_override
+    description: |
+      JSON map of submodule overrides.
+
+  - name: submodules_partial
+    description: |
+      Update submodules via partial clone (`depth=1`).
+    defaultvalue: true
+
+  - name: submodules_update_remote
+    description: |
+      Update remote submodules.
+    defaultvalue: false
+
+  - name: tags
+    description: |
+      Clone tags, if not explicitly set and event is tag its default is `true` else `false`.
+    defaultvalue: false
+
+  - name: use_ssh
+    description: |
+      Using ssh for git clone.
+    defaultvalue: false
+
+  - name: workdir
+    description: |
+      Path to clone git repository.
