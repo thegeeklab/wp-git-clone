@@ -110,11 +110,15 @@ func (p *Plugin) Execute() error {
 		// fetch and checkout by ref
 		log.Info().Msg("no commit information: using head checkout")
 
-		cmds = append(cmds, git.FetchSource(p.Settings.Repo.CommitRef, p.Settings.Tags, p.Settings.Depth, p.Settings.Filter))
+		cmds = append(cmds, git.FetchSource(p.Settings.Repo.CommitRef, p.Settings.Depth, p.Settings.Filter))
 		cmds = append(cmds, git.CheckoutHead())
 	} else {
-		cmds = append(cmds, git.FetchSource(p.Settings.Repo.CommitSha, p.Settings.Tags, p.Settings.Depth, p.Settings.Filter))
+		cmds = append(cmds, git.FetchSource(p.Settings.Repo.CommitSha, p.Settings.Depth, p.Settings.Filter))
 		cmds = append(cmds, git.CheckoutSha(p.Settings.Repo))
+	}
+
+	if p.Settings.Tags {
+		cmds = append(cmds, git.FetchTags())
 	}
 
 	for name, submoduleURL := range p.Settings.Repo.Submodules {

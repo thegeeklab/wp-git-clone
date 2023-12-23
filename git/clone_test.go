@@ -19,7 +19,6 @@ func TestFetch(t *testing.T) {
 			[]string{
 				"/usr/bin/git",
 				"fetch",
-				"--no-tags",
 				"origin",
 				"+refs/heads/master:",
 			},
@@ -31,7 +30,6 @@ func TestFetch(t *testing.T) {
 			[]string{
 				"/usr/bin/git",
 				"fetch",
-				"--no-tags",
 				"--depth=50",
 				"origin",
 				"+refs/heads/master:",
@@ -44,7 +42,6 @@ func TestFetch(t *testing.T) {
 			[]string{
 				"/usr/bin/git",
 				"fetch",
-				"--tags",
 				"--depth=100",
 				"origin",
 				"+refs/heads/master:",
@@ -52,7 +49,7 @@ func TestFetch(t *testing.T) {
 		},
 	}
 	for _, td := range testdata {
-		c := FetchSource(td.ref, td.tags, td.depth, "")
+		c := FetchSource(td.ref, td.depth, "")
 		if len(c.Args) != len(td.exp) {
 			t.Errorf("Expected: %s, got %s", td.exp, c.Args)
 		}

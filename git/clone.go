@@ -7,16 +7,9 @@ import (
 )
 
 // FetchSource fetches the source from remote.
-func FetchSource(ref string, tags bool, depth int, filter string) *execabs.Cmd {
-	tagsOption := "--tags"
-
-	if !tags {
-		tagsOption = "--no-tags"
-	}
-
+func FetchSource(ref string, depth int, filter string) *execabs.Cmd {
 	args := []string{
 		"fetch",
-		tagsOption,
 	}
 
 	if depth != 0 {
@@ -29,6 +22,21 @@ func FetchSource(ref string, tags bool, depth int, filter string) *execabs.Cmd {
 
 	args = append(args, "origin")
 	args = append(args, fmt.Sprintf("+%s:", ref))
+
+	return execabs.Command(
+		gitBin,
+		args...,
+	)
+}
+
+// FetchTags fetches the source from remote.
+func FetchTags() *execabs.Cmd {
+	args := []string{
+		"fetch",
+		"--tags",
+		"--quiet",
+		"origin",
+	}
 
 	return execabs.Command(
 		gitBin,
@@ -53,7 +61,8 @@ func FetchLFS() *execabs.Cmd {
 func CheckoutHead() *execabs.Cmd {
 	args := []string{
 		"checkout",
-		"-qf",
+		"--force",
+		"--quiet",
 		"FETCH_HEAD",
 	}
 
@@ -68,7 +77,7 @@ func CheckoutSha(repo Repository) *execabs.Cmd {
 	args := []string{
 		"reset",
 		"--hard",
-		"-q",
+		"--quiet",
 		repo.CommitSha,
 	}
 
