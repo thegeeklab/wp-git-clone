@@ -14,4 +14,5 @@ steps:
   - name: test
     image: docker.io/library/golang:1.21
     commands:
+      - apk --update add --no-cache git git-lfs
       - make test
