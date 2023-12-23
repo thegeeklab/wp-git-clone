@@ -8,20 +8,12 @@ import (
 func Init(repo Repository) *execabs.Cmd {
 	args := []string{
 		"init",
+		"-b",
+		repo.Branch,
 	}
 
-	if repo.Branch != "" {
-		args = []string{
-			"init",
-			"-b",
-			repo.Branch,
-		}
-	}
-
-	cmd := execabs.Command(
+	return execabs.Command(
 		gitBin,
 		args...,
 	)
-
-	return cmd
 }

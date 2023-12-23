@@ -3,6 +3,7 @@ properties:
   - name: branch
     description: |
       Change branch name.
+    defaultvalue: "main"
 
   - name: ci_netrc_machine
     description: |

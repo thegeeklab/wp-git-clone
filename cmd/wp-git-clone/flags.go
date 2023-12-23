@@ -147,6 +147,7 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 			Usage:       "change branch name",
 			EnvVars:     []string{"PLUGIN_BRANCH", "CI_COMMIT_BRANCH", "CI_REPO_DEFAULT_BRANCH"},
 			Destination: &settings.Repo.Branch,
+			Value:       "main",
 			Category:    category,
 		},
 		&cli.BoolFlag{
