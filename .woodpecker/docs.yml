@@ -16,7 +16,7 @@ steps:
     image: quay.io/thegeeklab/alpine-tools
     group: test
     commands:
-      - spellchecker --files '_docs/**/*.md' 'README.md' 'CONTRIBUTING.md' -d .dictionary -p spell indefinite-article syntax-urls
+      - spellchecker --files 'docs/**/*.md' 'README.md' 'CONTRIBUTING.md' -d .dictionary -p spell indefinite-article syntax-urls
     environment:
       FORCE_COLOR: "true"
 
@@ -24,7 +24,7 @@ steps:
     image: docker.io/lycheeverse/lychee
     group: test
     commands:
-      - lychee --no-progress --format detailed _docs/content README.md
+      - lychee --no-progress --format detailed docs/content README.md
 
   - name: publish
     image: quay.io/thegeeklab/wp-git-action
@@ -37,7 +37,7 @@ steps:
       message: "[skip ci] auto-update documentation"
       netrc_password:
         from_secret: github_token
-      pages_directory: _docs/
+      pages_directory: docs/
     when:
       - event: [push, manual]
         branch:
@@ -58,7 +58,7 @@ steps:
       - event: [push, manual]
         branch:
           - ${CI_REPO_DEFAULT_BRANCH}
-        status: [success]
+        status: [success, failure]
 
   - name: pushrm-quay
     image: docker.io/chko/docker-pushrm:1
