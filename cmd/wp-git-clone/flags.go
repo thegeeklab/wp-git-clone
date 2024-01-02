@@ -1,9 +1,3 @@
-// Copyright (c) 2020, the Drone Plugins project authors.
-// Copyright (c) 2021, Robert Kaussow <mail@thegeeklab.de>
-
-// Use of this source code is governed by an Apache 2.0 license that can be
-// found in the LICENSE file.
-
 package main
 
 import (
@@ -19,16 +13,18 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "remote",
-			Usage:       "git remote url",
+			Usage:       "git remote HTTP clone url",
 			EnvVars:     []string{"PLUGIN_REMOTE", "CI_REPO_CLONE_URL"},
 			Destination: &settings.Repo.RemoteURL,
+			DefaultText: "$CI_REPO_CLONE_URL",
 			Category:    category,
 		},
 		&cli.StringFlag{
 			Name:        "remote-ssh",
-			Usage:       "git clone ssh url",
+			Usage:       "git remote SSH clone url",
 			EnvVars:     []string{"PLUGIN_REMOTE_SSH", "CI_REPO_CLONE_SSH_URL"},
 			Destination: &settings.Repo.RemoteSSH,
+			DefaultText: "$CI_REPO_CLONE_SSH_URL",
 			Category:    category,
 		},
 		&cli.StringFlag{
@@ -36,6 +32,7 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 			Usage:       "path to clone git repository",
 			EnvVars:     []string{"PLUGIN_WORKDIR", "CI_WORKSPACE"},
 			Destination: &settings.WorkDir,
+			DefaultText: "$CI_WORKSPACE",
 			Category:    category,
 		},
 		&cli.StringFlag{
@@ -43,13 +40,14 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 			Usage:       "git commit sha",
 			EnvVars:     []string{"PLUGIN_COMMIT_SHA", "CI_COMMIT_SHA"},
 			Destination: &settings.Repo.CommitSha,
+			DefaultText: "$CI_COMMIT_SHA",
 			Category:    category,
 		},
 		&cli.StringFlag{
 			Name:        "ref",
-			Value:       "refs/heads/main",
 			Usage:       "git commit ref",
 			EnvVars:     []string{"PLUGIN_COMMIT_REF", "CI_COMMIT_REF"},
+			Value:       "refs/heads/main",
 			Destination: &settings.Repo.CommitRef,
 			Category:    category,
 		},
@@ -99,7 +97,7 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "insecure-skip-ssl-verify",
-			Usage:       "skip ssl verification of the remote machine",
+			Usage:       "skip SSL verification of the remote machine",
 			EnvVars:     []string{"PLUGIN_INSECURE_SKIP_SSL_VERIFY"},
 			Destination: &settings.Repo.InsecureSkipSSLVerify,
 			Category:    category,
@@ -113,14 +111,14 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 		},
 		&cli.GenericFlag{
 			Name:     "submodule-override",
-			Usage:    "json map of submodule overrides",
+			Usage:    "JSON map of submodule overrides",
 			EnvVars:  []string{"PLUGIN_SUBMODULE_OVERRIDE"},
 			Value:    &types.MapFlag{},
 			Category: category,
 		},
 		&cli.BoolFlag{
 			Name:        "submodule-partial",
-			Usage:       "update submodules via partial clone",
+			Usage:       "update submodules via partial clone (`depth=1`)",
 			EnvVars:     []string{"PLUGIN_SUBMODULES_PARTIAL", "PLUGIN_SUBMODULE_PARTIAL"},
 			Value:       true,
 			Destination: &settings.Repo.SubmodulePartial,
@@ -138,8 +136,8 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 			Name:        "branch",
 			Usage:       "change branch name",
 			EnvVars:     []string{"PLUGIN_BRANCH", "CI_COMMIT_BRANCH", "CI_REPO_DEFAULT_BRANCH"},
-			Destination: &settings.Repo.Branch,
 			Value:       "main",
+			Destination: &settings.Repo.Branch,
 			Category:    category,
 		},
 		&cli.BoolFlag{
@@ -154,18 +152,19 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 			Usage:       "define/replace safe directories",
 			EnvVars:     []string{"PLUGIN_SAFE_DIRECTORY", "CI_WORKSPACE"},
 			Destination: &settings.Repo.SafeDirectory,
+			DefaultText: "$CI_WORKSPACE",
 			Category:    category,
 		},
 		&cli.BoolFlag{
 			Name:        "use-ssh",
-			Usage:       "using ssh for git clone",
+			Usage:       "using SSH for git clone",
 			EnvVars:     []string{"PLUGIN_USE_SSH"},
 			Destination: &settings.UseSSH,
 			Category:    category,
 		},
 		&cli.StringFlag{
 			Name:        "ssh-key",
-			Usage:       "ssh key for ssh clone",
+			Usage:       "Private key for SSH clone",
 			EnvVars:     []string{"PLUGIN_SSH_KEY"},
 			Destination: &settings.SSHKey,
 			Category:    category,
