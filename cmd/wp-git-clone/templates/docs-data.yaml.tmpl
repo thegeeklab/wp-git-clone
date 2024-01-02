@@ -5,10 +5,16 @@ properties:
   - name: {{ $v.Name }}
     {{- with $v.Description }}
     description: |
-      {{ . }}
+      {{ . | ToSentence }}
+    {{- end }}
+    {{- with $v.Type }}
+    type: {{ . }}
     {{- end }}
     {{- with $v.Default }}
     defaultvalue: {{ . }}
+    {{- end }}
+    {{- with $v.Required }}
+    required: {{ . }}
     {{- end }}
 {{ end -}}
 {{ end -}}

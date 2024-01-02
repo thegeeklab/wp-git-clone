@@ -1,8 +1,3 @@
-// Copyright (c) 2023, Robert Kaussow <mail@thegeeklab.de>
-
-// Use of this source code is governed by an Apache 2.0 license that can be
-// found in the LICENSE file.
-
 package plugin
 
 import (
@@ -18,6 +13,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/thegeeklab/wp-git-clone/git"
+	"github.com/thegeeklab/wp-plugin-go/trace"
 	"github.com/thegeeklab/wp-plugin-go/types"
 	"golang.org/x/sys/execabs"
 )
@@ -179,7 +175,7 @@ func (p *Plugin) execCmd(cmd *execabs.Cmd, buf *bytes.Buffer) error {
 	cmd.Stderr = io.MultiWriter(os.Stderr, buf)
 	cmd.Dir = p.Settings.WorkDir
 
-	trace(cmd)
+	trace.Cmd(cmd)
 
 	return cmd.Run()
 }

@@ -1,13 +1,13 @@
 package plugin
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/rs/zerolog/log"
+	"github.com/thegeeklab/wp-plugin-go/trace"
 	"golang.org/x/sys/execabs"
 )
 
@@ -25,10 +25,6 @@ func newBackoff(maxRetries uint64) backoff.BackOff {
 	return backoff.WithMaxRetries(b, maxRetries)
 }
 
-func trace(cmd *execabs.Cmd) {
-	fmt.Fprintf(os.Stdout, "+ %s\n", strings.Join(cmd.Args, " "))
-}
-
 func retryCmd(cmd *execabs.Cmd) error {
 	backoffOps := func() error {
 		// copy the original command
@@ -39,7 +35,7 @@ func retryCmd(cmd *execabs.Cmd) error {
 		retry.Stdout = os.Stdout
 		retry.Stderr = os.Stderr
 
-		trace(cmd)
+		trace.Cmd(cmd)
 
 		return cmd.Run()
 	}
