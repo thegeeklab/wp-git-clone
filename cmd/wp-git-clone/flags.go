@@ -164,7 +164,7 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ssh-key",
-			Usage:       "Private key for SSH clone",
+			Usage:       "private key for SSH clone",
 			EnvVars:     []string{"PLUGIN_SSH_KEY"},
 			Destination: &settings.SSHKey,
 			Category:    category,
