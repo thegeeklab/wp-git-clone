@@ -11,7 +11,7 @@ properties:
     type: {{ . }}
     {{- end }}
     {{- with $v.Default }}
-    defaultvalue: {{ . }}
+    defaultValue: {{ . | toString }}
     {{- end }}
     required: {{ default false $v.Required }}
 {{ end -}}
