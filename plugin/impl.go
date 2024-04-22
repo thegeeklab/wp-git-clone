@@ -48,6 +48,12 @@ func (p *Plugin) run(ctx context.Context) error {
 
 // Validate handles the settings validation of the plugin.
 func (p *Plugin) Validate() error {
+	// This default cannot be set in the cli flag, as the CI_* environment variables
+	// can be set empty, resulting in an empty default value.
+	if p.Settings.Repo.Branch == "" {
+		p.Settings.Repo.Branch = "main"
+	}
+
 	if p.Settings.WorkDir == "" {
 		var err error
 		if p.Settings.WorkDir, err = os.Getwd(); err != nil {
