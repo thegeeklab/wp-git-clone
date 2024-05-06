@@ -3,34 +3,34 @@ package git
 import (
 	"fmt"
 
+	"github.com/thegeeklab/wp-plugin-go/v2/types"
 	"golang.org/x/sys/execabs"
 )
 
 // FetchSource fetches the source from remote.
-func FetchSource(ref string, depth int, filter string) *execabs.Cmd {
+func (r *Repository) FetchSource(ref string) *types.Cmd {
 	args := []string{
 		"fetch",
 	}
 
-	if depth != 0 {
-		args = append(args, fmt.Sprintf("--depth=%d", depth))
+	if r.Depth != 0 {
+		args = append(args, fmt.Sprintf("--depth=%d", r.Depth))
 	}
 
-	if filter != "" {
-		args = append(args, "--filter="+filter)
+	if r.Filter != "" {
+		args = append(args, "--filter", r.Filter)
 	}
 
 	args = append(args, "origin")
 	args = append(args, fmt.Sprintf("+%s:", ref))
 
-	return execabs.Command(
-		gitBin,
-		args...,
-	)
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }
 
 // FetchTags fetches the source from remote.
-func FetchTags() *execabs.Cmd {
+func (r *Repository) FetchTags() *types.Cmd {
 	args := []string{
 		"fetch",
 		"--tags",
@@ -38,27 +38,25 @@ func FetchTags() *execabs.Cmd {
 		"origin",
 	}
 
-	return execabs.Command(
-		gitBin,
-		args...,
-	)
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }
 
 // FetchLFS fetches lfs.
-func FetchLFS() *execabs.Cmd {
+func (r *Repository) FetchLFS() *types.Cmd {
 	args := []string{
 		"lfs",
 		"fetch",
 	}
 
-	return execabs.Command(
-		gitBin,
-		args...,
-	)
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }
 
 // CheckoutHead handles head checkout.
-func CheckoutHead() *execabs.Cmd {
+func (r *Repository) CheckoutHead() *types.Cmd {
 	args := []string{
 		"checkout",
 		"--force",
@@ -66,36 +64,33 @@ func CheckoutHead() *execabs.Cmd {
 		"FETCH_HEAD",
 	}
 
-	return execabs.Command(
-		gitBin,
-		args...,
-	)
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }
 
 // CheckoutSha handles commit checkout.
-func CheckoutSha(repo Repository) *execabs.Cmd {
+func (r *Repository) CheckoutSha() *types.Cmd {
 	args := []string{
 		"reset",
 		"--hard",
 		"--quiet",
-		repo.CommitSha,
+		r.CommitSha,
 	}
 
-	return execabs.Command(
-		gitBin,
-		args...,
-	)
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }
 
 // CheckoutLFS handles commit checkout.
-func CheckoutLFS() *execabs.Cmd {
+func (r *Repository) CheckoutLFS() *types.Cmd {
 	args := []string{
 		"lfs",
 		"checkout",
 	}
 
-	return execabs.Command(
-		gitBin,
-		args...,
-	)
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }

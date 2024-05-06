@@ -4,43 +4,42 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/thegeeklab/wp-plugin-go/v2/types"
 	"golang.org/x/sys/execabs"
 )
 
 // ConfigSSLVerify disables globally the git ssl verification.
-func ConfigSSLVerify(repo Repository) *execabs.Cmd {
+func (r *Repository) ConfigSSLVerify(skipVerify bool) *types.Cmd {
 	args := []string{
 		"config",
 		"--global",
 		"http.sslVerify",
-		strconv.FormatBool(!repo.InsecureSkipSSLVerify),
+		strconv.FormatBool(!skipVerify),
 	}
 
-	return execabs.Command(
-		gitBin,
-		args...,
-	)
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }
 
 // ConfigSafeDirectory disables globally the git ssl verification.
-func ConfigSafeDirectory(repo Repository) *execabs.Cmd {
+func (r *Repository) ConfigSafeDirectory() *types.Cmd {
 	args := []string{
 		"config",
 		"--global",
 		"--replace-all",
 		"safe.directory",
-		repo.SafeDirectory,
+		r.SafeDirectory,
 	}
 
-	return execabs.Command(
-		gitBin,
-		args...,
-	)
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }
 
 // ConfigRemapSubmodule returns a git command that, when executed configures git to
 // remap submodule urls.
-func ConfigRemapSubmodule(name, url string) *execabs.Cmd {
+func (r *Repository) ConfigRemapSubmodule(name, url string) *types.Cmd {
 	args := []string{
 		"config",
 		"--global",
@@ -48,14 +47,13 @@ func ConfigRemapSubmodule(name, url string) *execabs.Cmd {
 		url,
 	}
 
-	return execabs.Command(
-		gitBin,
-		args...,
-	)
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }
 
 // ConfigSSHCommand sets custom SSH key.
-func ConfigSSHCommand(sshKey string) *execabs.Cmd {
+func (r *Repository) ConfigSSHCommand(sshKey string) *types.Cmd {
 	args := []string{
 		"config",
 		"--global",
@@ -63,8 +61,7 @@ func ConfigSSHCommand(sshKey string) *execabs.Cmd {
 		"ssh -i " + sshKey,
 	}
 
-	return execabs.Command(
-		gitBin,
-		args...,
-	)
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }

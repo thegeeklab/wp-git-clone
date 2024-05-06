@@ -8,14 +8,12 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"github.com/thegeeklab/wp-git-clone/git"
-	"github.com/thegeeklab/wp-plugin-go/trace"
-	"github.com/thegeeklab/wp-plugin-go/types"
-	"golang.org/x/sys/execabs"
+	"github.com/thegeeklab/wp-plugin-go/v2/file"
+	"github.com/thegeeklab/wp-plugin-go/v2/types"
+	"github.com/thegeeklab/wp-plugin-go/v2/util"
 )
 
 const (
@@ -48,22 +46,24 @@ func (p *Plugin) run(ctx context.Context) error {
 
 // Validate handles the settings validation of the plugin.
 func (p *Plugin) Validate() error {
+	var err error
+
 	// This default cannot be set in the cli flag, as the CI_* environment variables
 	// can be set empty, resulting in an empty default value.
 	if p.Settings.Repo.Branch == "" {
 		p.Settings.Repo.Branch = "main"
 	}
 
-	if p.Settings.WorkDir == "" {
-		var err error
-		if p.Settings.WorkDir, err = os.Getwd(); err != nil {
-			return err
+	if p.Settings.Repo.WorkDir == "" {
+		p.Settings.Repo.WorkDir, err = os.Getwd()
+		if err != nil {
+			return fmt.Errorf("failed to get working directory: %w", err)
 		}
 	}
 
 	if p.Settings.Partial {
-		p.Settings.Depth = 1
-		p.Settings.Filter = "tree:0"
+		p.Settings.Repo.Depth = 1
+		p.Settings.Repo.Filter = "tree:0"
 	}
 
 	return nil
@@ -71,76 +71,93 @@ func (p *Plugin) Validate() error {
 
 // Execute provides the implementation of the plugin.
 func (p *Plugin) Execute() error {
-	cmds := make([]*execabs.Cmd, 0)
+	var err error
 
-	// Handle init
-	initPath := filepath.Join(p.Settings.WorkDir, ".git")
+	homeDir := util.GetUserHomeDir()
+	batchCmd := make([]*types.Cmd, 0)
 
-	if err := os.MkdirAll(p.Settings.WorkDir, os.ModePerm); err != nil {
-		return err
+	fmt.Println(p.Settings.Repo.WorkDir)
+
+	// Handle repo initialization.
+	if err := os.MkdirAll(p.Settings.Repo.WorkDir, os.ModePerm); err != nil {
+		return fmt.Errorf("failed to create working directory: %w", err)
 	}
 
-	//nolint:nestif
-	if _, err := os.Stat(initPath); os.IsNotExist(err) {
-		cmds = append(cmds, git.ConfigSafeDirectory(p.Settings.Repo))
+	p.Settings.Repo.IsEmpty, err = file.IsDirEmpty(p.Settings.Repo.WorkDir)
+	if err != nil {
+		return fmt.Errorf("failed to check working directory: %w", err)
+	}
 
-		if err := p.execCmd(git.Init(p.Settings.Repo), new(bytes.Buffer)); err != nil {
-			return err
+	isDir, err := file.IsDir(filepath.Join(p.Settings.Repo.WorkDir, ".git"))
+	if err != nil {
+		return fmt.Errorf("failed to check working directory: %w", err)
+	}
+
+	if !isDir {
+		batchCmd = append(batchCmd, p.Settings.Repo.Init())
+		batchCmd = append(batchCmd, p.Settings.Repo.RemoteAdd())
+
+		if p.Settings.SSHKey != "" {
+			batchCmd = append(batchCmd, p.Settings.Repo.ConfigSSHCommand(p.Settings.SSHKey))
 		}
-
-		if p.Settings.UseSSH {
-			cmds = append(cmds, git.RemoteAdd(p.Settings.Repo.RemoteSSH))
-			if p.Settings.SSHKey != "" {
-				cmds = append(cmds, git.ConfigSSHCommand(p.Settings.SSHKey))
-			}
-		} else {
-			cmds = append(cmds, git.RemoteAdd(p.Settings.Repo.RemoteURL))
-		}
 	}
 
-	if p.Settings.Repo.InsecureSkipSSLVerify {
-		cmds = append(cmds, git.ConfigSSLVerify(p.Settings.Repo))
-	}
+	batchCmd = append(batchCmd, p.Settings.Repo.ConfigSSLVerify(p.Network.InsecureSkipVerify))
 
-	if err := git.WriteNetrc(p.Settings.Netrc.Machine, p.Settings.Netrc.Login, p.Settings.Netrc.Password); err != nil {
+	netrc := p.Settings.Netrc
+	if err := WriteNetrc(homeDir, netrc.Machine, netrc.Login, netrc.Password); err != nil {
 		return err
 	}
 
 	// Handle clone
-
 	if p.Settings.Repo.CommitSha == "" {
 		// fetch and checkout by ref
 		log.Info().Msg("no commit information: using head checkout")
 
-		cmds = append(cmds, git.FetchSource(p.Settings.Repo.CommitRef, p.Settings.Depth, p.Settings.Filter))
-		cmds = append(cmds, git.CheckoutHead())
+		batchCmd = append(batchCmd, p.Settings.Repo.FetchSource(p.Settings.Repo.CommitRef))
+		batchCmd = append(batchCmd, p.Settings.Repo.CheckoutHead())
 	} else {
-		cmds = append(cmds, git.FetchSource(p.Settings.Repo.CommitSha, p.Settings.Depth, p.Settings.Filter))
-		cmds = append(cmds, git.CheckoutSha(p.Settings.Repo))
+		batchCmd = append(batchCmd, p.Settings.Repo.FetchSource(p.Settings.Repo.CommitSha))
+		batchCmd = append(batchCmd, p.Settings.Repo.CheckoutSha())
 	}
 
 	if p.Settings.Tags {
-		cmds = append(cmds, git.FetchTags())
+		batchCmd = append(batchCmd, p.Settings.Repo.FetchTags())
 	}
 
 	for name, submoduleURL := range p.Settings.Repo.Submodules {
-		cmds = append(cmds, git.ConfigRemapSubmodule(name, submoduleURL))
+		batchCmd = append(batchCmd, p.Settings.Repo.ConfigRemapSubmodule(name, submoduleURL))
 	}
 
 	if p.Settings.Recursive {
-		cmds = append(cmds, git.SubmoduleUpdate(p.Settings.Repo))
+		batchCmd = append(batchCmd, p.Settings.Repo.SubmoduleUpdate())
 	}
 
 	if p.Settings.Lfs {
-		cmds = append(cmds, git.FetchLFS())
-		cmds = append(cmds, git.CheckoutLFS())
+		batchCmd = append(batchCmd, p.Settings.Repo.FetchLFS())
+		batchCmd = append(batchCmd, p.Settings.Repo.CheckoutLFS())
 	}
 
-	for _, cmd := range cmds {
-		log.Debug().Msgf("+ %s", strings.Join(cmd.Args, " "))
-
+	for _, cmd := range batchCmd {
 		buf := new(bytes.Buffer)
-		err := p.execCmd(cmd, buf)
+
+		// Don' set GIT_TERMINAL_PROMPT=0 as it prevents git from loading .netrc
+		defaultEnvVars := []string{
+			"GIT_LFS_SKIP_SMUDGE=1", // prevents git-lfs from retrieving any LFS files
+		}
+
+		if p.Settings.Home != "" {
+			if _, err := os.Stat(p.Settings.Home); !os.IsNotExist(err) {
+				defaultEnvVars = append(defaultEnvVars, fmt.Sprintf("HOME=%s", p.Settings.Home))
+			}
+		}
+
+		cmd.Env = append(os.Environ(), defaultEnvVars...)
+		cmd.Stdout = io.MultiWriter(os.Stdout, buf)
+		cmd.Stderr = io.MultiWriter(os.Stderr, buf)
+		cmd.Dir = p.Settings.Repo.WorkDir
+
+		err := cmd.Run()
 
 		switch {
 		case err != nil && shouldRetry(buf.String()):
@@ -162,26 +179,4 @@ func (p *Plugin) FlagsFromContext() error {
 	p.Settings.Repo.Submodules = submodules.Get()
 
 	return nil
-}
-
-func (p *Plugin) execCmd(cmd *execabs.Cmd, buf *bytes.Buffer) error {
-	// Don' set GIT_TERMINAL_PROMPT=0 as it prevents git from loading .netrc
-	defaultEnvVars := []string{
-		"GIT_LFS_SKIP_SMUDGE=1", // prevents git-lfs from retrieving any LFS files
-	}
-
-	if p.Settings.Home != "" {
-		if _, err := os.Stat(p.Settings.Home); !os.IsNotExist(err) {
-			defaultEnvVars = append(defaultEnvVars, fmt.Sprintf("HOME=%s", p.Settings.Home))
-		}
-	}
-
-	cmd.Env = append(os.Environ(), defaultEnvVars...)
-	cmd.Stdout = io.MultiWriter(os.Stdout, buf)
-	cmd.Stderr = io.MultiWriter(os.Stderr, buf)
-	cmd.Dir = p.Settings.WorkDir
-
-	trace.Cmd(cmd)
-
-	return cmd.Run()
 }

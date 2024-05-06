@@ -2,62 +2,70 @@ package git
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-// TestFetch tests if the arguments to `git fetch` are constructed properly.
 func TestFetch(t *testing.T) {
 	testdata := []struct {
-		ref   string
+		name  string
+		repo  *Repository
 		tags  bool
 		depth int
-		exp   []string
+		want  []string
 	}{
 		{
-			"refs/heads/master",
-			false,
-			0,
-			[]string{
-				"/usr/bin/git",
+			name: "fetch main without tags",
+			repo: &Repository{
+				CommitRef: "refs/heads/main",
+			},
+			tags:  false,
+			depth: 0,
+			want: []string{
+				gitBin,
 				"fetch",
 				"origin",
-				"+refs/heads/master:",
+				"+refs/heads/main:",
 			},
 		},
 		{
-			"refs/heads/master",
-			false,
-			50,
-			[]string{
-				"/usr/bin/git",
+			name: "fetch main without tags with depth",
+			repo: &Repository{
+				CommitRef: "refs/heads/main",
+				Depth:     50,
+			},
+			tags:  false,
+			depth: 50,
+			want: []string{
+				gitBin,
 				"fetch",
 				"--depth=50",
 				"origin",
-				"+refs/heads/master:",
+				"+refs/heads/main:",
 			},
 		},
 		{
-			"refs/heads/master",
-			true,
-			100,
-			[]string{
-				"/usr/bin/git",
+			name: "fetch main with tags and depth",
+			repo: &Repository{
+				CommitRef: "refs/heads/main",
+				Depth:     100,
+			},
+			tags:  true,
+			depth: 100,
+			want: []string{
+				gitBin,
 				"fetch",
 				"--depth=100",
 				"origin",
-				"+refs/heads/master:",
+				"+refs/heads/main:",
 			},
 		},
 	}
-	for _, td := range testdata {
-		c := FetchSource(td.ref, td.depth, "")
-		if len(c.Args) != len(td.exp) {
-			t.Errorf("Expected: %s, got %s", td.exp, c.Args)
-		}
 
-		for i := range c.Args {
-			if c.Args[i] != td.exp[i] {
-				t.Errorf("Expected: %s, got %s", td.exp, c.Args)
-			}
-		}
+	for _, tt := range testdata {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := tt.repo.FetchSource(tt.repo.CommitRef)
+			require.Equal(t, tt.want, cmd.Args)
+		})
 	}
 }

@@ -1,7 +1,5 @@
 package git
 
-const gitBin = "/usr/bin/git"
-
 type Repository struct {
 	RemoteURL        string
 	RemoteSSH        string
@@ -12,7 +10,11 @@ type Repository struct {
 	SubmoduleRemote  bool
 	SubmodulePartial bool
 
-	InsecureSkipSSLVerify bool
-	SafeDirectory         string
-	InitExists            bool
+	SafeDirectory string
+	WorkDir       string
+	IsEmpty       bool
+	Filter        string
+	Depth         int
 }
+
+const gitBin = "/usr/bin/git"
