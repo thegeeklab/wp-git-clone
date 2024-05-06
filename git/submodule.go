@@ -1,11 +1,12 @@
 package git
 
 import (
+	"github.com/thegeeklab/wp-plugin-go/v2/types"
 	"golang.org/x/sys/execabs"
 )
 
 // SubmoduleUpdate recursively initializes and updates submodules.
-func SubmoduleUpdate(repo Repository) *execabs.Cmd {
+func (r *Repository) SubmoduleUpdate() *types.Cmd {
 	args := []string{
 		"submodule",
 		"update",
@@ -13,18 +14,15 @@ func SubmoduleUpdate(repo Repository) *execabs.Cmd {
 		"--recursive",
 	}
 
-	if repo.SubmodulePartial {
+	if r.SubmodulePartial {
 		args = append(args, "--depth=1", "--recommend-shallow")
 	}
 
-	cmd := execabs.Command(
-		gitBin,
-		args...,
-	)
-
-	if repo.SubmoduleRemote {
-		cmd.Args = append(cmd.Args, "--remote")
+	if r.SubmoduleRemote {
+		args = append(args, "--remote")
 	}
 
-	return cmd
+	return &types.Cmd{
+		Cmd: execabs.Command(gitBin, args...),
+	}
 }

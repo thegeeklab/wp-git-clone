@@ -2,19 +2,25 @@ package git
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 // TestUpdateSubmodules tests if the arguments to `git submodule update`
 // are constructed properly.
 func TestUpdateSubmodules(t *testing.T) {
 	tests := []struct {
-		partial bool
-		exp     []string
+		name string
+		repo *Repository
+		want []string
 	}{
 		{
-			false,
-			[]string{
-				"/usr/bin/git",
+			name: "full submodule update",
+			repo: &Repository{
+				SubmodulePartial: false,
+			},
+			want: []string{
+				gitBin,
 				"submodule",
 				"update",
 				"--init",
@@ -22,9 +28,12 @@ func TestUpdateSubmodules(t *testing.T) {
 			},
 		},
 		{
-			true,
-			[]string{
-				"/usr/bin/git",
+			name: "partial submodule update",
+			repo: &Repository{
+				SubmodulePartial: true,
+			},
+			want: []string{
+				gitBin,
 				"submodule",
 				"update",
 				"--init",
@@ -33,35 +42,13 @@ func TestUpdateSubmodules(t *testing.T) {
 				"--recommend-shallow",
 			},
 		},
-	}
-	for _, tt := range tests {
-		repo := Repository{
-			SubmoduleRemote:  false,
-			SubmodulePartial: tt.partial,
-		}
-
-		c := SubmoduleUpdate(repo)
-		if len(c.Args) != len(tt.exp) {
-			t.Errorf("Expected: %s, got %s", tt.exp, c.Args)
-		}
-
-		for i := range c.Args {
-			if c.Args[i] != tt.exp[i] {
-				t.Errorf("Expected: %s, got %s", tt.exp, c.Args)
-			}
-		}
-	}
-}
-
-// TestUpdateSubmodules tests if the arguments to `git submodule update`
-// are constructed properly.
-func TestUpdateSubmodulesRemote(t *testing.T) {
-	tests := []struct {
-		exp []string
-	}{
 		{
-			[]string{
-				"/usr/bin/git",
+			name: "submodule update with remote",
+			repo: &Repository{
+				SubmoduleRemote: true,
+			},
+			want: []string{
+				gitBin,
 				"submodule",
 				"update",
 				"--init",
@@ -70,31 +57,28 @@ func TestUpdateSubmodulesRemote(t *testing.T) {
 			},
 		},
 		{
-			[]string{
-				"/usr/bin/git",
+			name: "submodule update with remote and partial",
+			repo: &Repository{
+				SubmoduleRemote:  true,
+				SubmodulePartial: true,
+			},
+			want: []string{
+				gitBin,
 				"submodule",
 				"update",
 				"--init",
 				"--recursive",
+				"--depth=1",
+				"--recommend-shallow",
 				"--remote",
 			},
 		},
 	}
+
 	for _, tt := range tests {
-		repo := Repository{
-			SubmoduleRemote:  true,
-			SubmodulePartial: false,
-		}
-
-		c := SubmoduleUpdate(repo)
-		if len(c.Args) != len(tt.exp) {
-			t.Errorf("Expected: %s, got %s", tt.exp, c.Args)
-		}
-
-		for i := range c.Args {
-			if c.Args[i] != tt.exp[i] {
-				t.Errorf("Expected: %s, got %s", tt.exp, c.Args)
-			}
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := tt.repo.SubmoduleUpdate()
+			require.Equal(t, tt.want, cmd.Args)
+		})
 	}
 }

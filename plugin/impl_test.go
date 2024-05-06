@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -28,19 +29,18 @@ func TestClone(t *testing.T) {
 		dir := setup()
 		defer teardown(dir)
 
-		plugin := Plugin{
-			Settings: &Settings{
-				Repo: git.Repository{
-					RemoteURL: tt.clone,
-					CommitRef: tt.ref,
-					CommitSha: tt.commit,
-					Branch:    "main",
-				},
-				Home:      "/tmp",
+		plugin := New(func(_ context.Context) error { return nil })
+		plugin.Settings = &Settings{
+			Repo: git.Repository{
+				RemoteURL: tt.clone,
+				CommitRef: tt.ref,
+				CommitSha: tt.commit,
+				Branch:    "main",
 				WorkDir:   filepath.Join(dir, tt.path),
-				Recursive: tt.recursive,
-				Lfs:       tt.lfs,
 			},
+			Home:      "/tmp",
+			Recursive: tt.recursive,
+			Lfs:       tt.lfs,
 		}
 
 		if err := plugin.Execute(); err != nil {
@@ -48,14 +48,14 @@ func TestClone(t *testing.T) {
 		}
 
 		if tt.data != "" {
-			data := readFile(plugin.Settings.WorkDir, tt.file)
+			data := readFile(plugin.Settings.Repo.WorkDir, tt.file)
 			if data != tt.data {
 				t.Errorf("Expected %s to contain [%s]. Got [%s].", tt.file, tt.data, data)
 			}
 		}
 
 		if tt.dataSize != 0 {
-			size := getFileSize(plugin.Settings.WorkDir, tt.file)
+			size := getFileSize(plugin.Settings.Repo.WorkDir, tt.file)
 			if size != tt.dataSize {
 				t.Errorf("Expected %s size to be [%d]. Got [%d].", tt.file, tt.dataSize, size)
 			}
@@ -71,19 +71,18 @@ func TestCloneNonEmpty(t *testing.T) {
 	defer teardown(dir)
 
 	for _, tt := range getCommits() {
-		plugin := Plugin{
-			Settings: &Settings{
-				Repo: git.Repository{
-					RemoteURL: tt.clone,
-					CommitRef: tt.ref,
-					CommitSha: tt.commit,
-					Branch:    "main",
-				},
-				Home:      "/tmp",
+		plugin := New(func(_ context.Context) error { return nil })
+		plugin.Settings = &Settings{
+			Repo: git.Repository{
+				RemoteURL: tt.clone,
+				CommitRef: tt.ref,
+				CommitSha: tt.commit,
+				Branch:    "main",
 				WorkDir:   filepath.Join(dir, tt.path),
-				Recursive: tt.recursive,
-				Lfs:       tt.lfs,
 			},
+			Home:      "/tmp",
+			Recursive: tt.recursive,
+			Lfs:       tt.lfs,
 		}
 
 		if err := plugin.Execute(); err != nil {
@@ -91,7 +90,7 @@ func TestCloneNonEmpty(t *testing.T) {
 		}
 
 		if tt.data != "" {
-			data := readFile(plugin.Settings.WorkDir, tt.file)
+			data := readFile(plugin.Settings.Repo.WorkDir, tt.file)
 			if data != tt.data {
 				t.Errorf("Expected %s to contain [%q]. Got [%q].", tt.file, tt.data, data)
 
@@ -100,7 +99,7 @@ func TestCloneNonEmpty(t *testing.T) {
 		}
 
 		if tt.dataSize != 0 {
-			size := getFileSize(plugin.Settings.WorkDir, tt.file)
+			size := getFileSize(plugin.Settings.Repo.WorkDir, tt.file)
 			if size != tt.dataSize {
 				t.Errorf("Expected %s size to be [%d]. Got [%d].", tt.file, tt.dataSize, size)
 			}

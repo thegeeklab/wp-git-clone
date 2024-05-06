@@ -1,12 +1,10 @@
-package main
+package plugin
 
 import (
 	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/thegeeklab/wp-git-clone/plugin"
-	wp "github.com/thegeeklab/wp-plugin-go/plugin"
 )
 
 func Test_pluginOptions(t *testing.T) {
@@ -29,14 +27,7 @@ func Test_pluginOptions(t *testing.T) {
 			t.Setenv(key, value)
 		}
 
-		settings := &plugin.Settings{}
-		options := wp.Options{
-			Name:    "wp-git-clone",
-			Flags:   settingsFlags(settings, wp.FlagsPluginCategory),
-			Execute: func(_ context.Context) error { return nil },
-		}
-
-		got := plugin.New(options, settings)
+		got := New(func(_ context.Context) error { return nil })
 
 		_ = got.App.Run([]string{"wp-git-clone"})
 		_ = got.Validate()

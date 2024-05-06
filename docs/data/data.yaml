@@ -28,9 +28,9 @@ properties:
     defaultValue: 0
     required: false
 
-  - name: insecure_skip_ssl_verify
+  - name: insecure_skip_verify
     description: |
-      Skip SSL verification of the remote machine.
+      Skip SSL verification.
 
       Activating this option is insecure and should be avoided in most cases.
     type: bool
@@ -42,6 +42,13 @@ properties:
       Whether to retrieve LFS content if available.
     type: bool
     defaultValue: true
+    required: false
+
+  - name: log_level
+    description: |
+      Plugin log level.
+    type: string
+    defaultValue: "info"
     required: false
 
   - name: partial
@@ -110,13 +117,6 @@ properties:
       Fetch git tags during clone.
     type: bool
     defaultValue: true
-    required: false
-
-  - name: use_ssh
-    description: |
-      Using SSH for git clone.
-    type: bool
-    defaultValue: false
     required: false
 
   - name: workdir
