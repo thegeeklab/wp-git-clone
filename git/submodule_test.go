@@ -3,7 +3,7 @@ package git
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
 // TestUpdateSubmodules tests if the arguments to `git submodule update`
@@ -78,7 +78,7 @@ func TestUpdateSubmodules(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.SubmoduleUpdate()
-			require.Equal(t, tt.want, cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }

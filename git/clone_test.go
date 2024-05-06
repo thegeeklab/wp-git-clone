@@ -3,7 +3,7 @@ package git
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFetchSource(t *testing.T) {
@@ -65,7 +65,7 @@ func TestFetchSource(t *testing.T) {
 	for _, tt := range testdata {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.FetchSource(tt.repo.CommitRef)
-			require.Equal(t, tt.want, cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }
@@ -95,7 +95,7 @@ func TestFetchTags(t *testing.T) {
 	for _, tt := range testdata {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.FetchTags()
-			require.Equal(t, tt.want, cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }
@@ -120,7 +120,7 @@ func TestFetchLFS(t *testing.T) {
 	for _, tt := range testdata {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.FetchLFS()
-			require.Equal(t, tt.want, cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }
@@ -147,7 +147,7 @@ func TestCheckoutHead(t *testing.T) {
 	for _, tt := range testdata {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.CheckoutHead()
-			require.Equal(t, tt.want, cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }
@@ -176,7 +176,7 @@ func TestCheckoutSha(t *testing.T) {
 	for _, tt := range testdata {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.CheckoutSha()
-			require.Equal(t, tt.want, cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }
@@ -201,7 +201,7 @@ func TestCheckoutLFS(t *testing.T) {
 	for _, tt := range testdata {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.CheckoutLFS()
-			require.Equal(t, tt.want, cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }
