@@ -13,8 +13,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/thegeeklab/wp-git-clone/git"
-	"github.com/thegeeklab/wp-plugin-go/trace"
-	"github.com/thegeeklab/wp-plugin-go/types"
+	"github.com/thegeeklab/wp-plugin-go/v2/trace"
+	"github.com/thegeeklab/wp-plugin-go/v2/types"
 	"golang.org/x/sys/execabs"
 )
 

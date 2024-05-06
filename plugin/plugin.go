@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"github.com/thegeeklab/wp-git-clone/git"
-	wp "github.com/thegeeklab/wp-plugin-go/plugin"
+	wp "github.com/thegeeklab/wp-plugin-go/v2/plugin"
 )
 
 // Plugin implements provide the plugin.

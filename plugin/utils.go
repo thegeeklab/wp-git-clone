@@ -7,7 +7,7 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/rs/zerolog/log"
-	"github.com/thegeeklab/wp-plugin-go/trace"
+	"github.com/thegeeklab/wp-plugin-go/v2/trace"
 	"golang.org/x/sys/execabs"
 )
 

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/thegeeklab/wp-git-clone/plugin"
-	wp "github.com/thegeeklab/wp-plugin-go/plugin"
+	wp "github.com/thegeeklab/wp-plugin-go/v2/plugin"
 )
 
 func Test_pluginOptions(t *testing.T) {
