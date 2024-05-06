@@ -61,7 +61,10 @@ func (r *Repository) ConfigSSHCommand(sshKey string) *types.Cmd {
 		"ssh -i " + sshKey,
 	}
 
-	return &types.Cmd{
+	cmd := &types.Cmd{
 		Cmd: execabs.Command(gitBin, args...),
 	}
+	cmd.SetTrace(false)
+
+	return cmd
 }
