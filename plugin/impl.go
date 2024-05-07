@@ -139,6 +139,10 @@ func (p *Plugin) Execute() error {
 	}
 
 	for _, cmd := range batchCmd {
+		if cmd == nil {
+			continue
+		}
+
 		buf := new(bytes.Buffer)
 
 		// Don' set GIT_TERMINAL_PROMPT=0 as it prevents git from loading .netrc
