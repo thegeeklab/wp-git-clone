@@ -2,7 +2,6 @@ package git
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 
 	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
@@ -18,8 +17,7 @@ func (r *Repository) ConfigSSLVerify(skipVerify bool) *plugin_exec.Cmd {
 	}
 
 	cmd := plugin_exec.Command(gitBin, args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Trace = false
 
 	return cmd
 }
@@ -35,8 +33,7 @@ func (r *Repository) ConfigSafeDirectory() *plugin_exec.Cmd {
 	}
 
 	cmd := plugin_exec.Command(gitBin, args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Trace = false
 
 	return cmd
 }
@@ -52,8 +49,7 @@ func (r *Repository) ConfigRemapSubmodule(name, url string) *plugin_exec.Cmd {
 	}
 
 	cmd := plugin_exec.Command(gitBin, args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Trace = false
 
 	return cmd
 }
