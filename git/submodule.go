@@ -1,12 +1,13 @@
 package git
 
 import (
-	"github.com/thegeeklab/wp-plugin-go/v2/types"
-	"golang.org/x/sys/execabs"
+	"os"
+
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 )
 
 // SubmoduleUpdate recursively initializes and updates submodules.
-func (r *Repository) SubmoduleUpdate() *types.Cmd {
+func (r *Repository) SubmoduleUpdate() *plugin_exec.Cmd {
 	args := []string{
 		"submodule",
 		"update",
@@ -22,7 +23,9 @@ func (r *Repository) SubmoduleUpdate() *types.Cmd {
 		args = append(args, "--remote")
 	}
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }

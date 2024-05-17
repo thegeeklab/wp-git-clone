@@ -2,13 +2,13 @@ package git
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/thegeeklab/wp-plugin-go/v2/types"
-	"golang.org/x/sys/execabs"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 )
 
 // FetchSource fetches the source from remote.
-func (r *Repository) FetchSource(ref string) *types.Cmd {
+func (r *Repository) FetchSource(ref string) *plugin_exec.Cmd {
 	args := []string{
 		"fetch",
 	}
@@ -24,13 +24,15 @@ func (r *Repository) FetchSource(ref string) *types.Cmd {
 	args = append(args, "origin")
 	args = append(args, fmt.Sprintf("+%s:", ref))
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }
 
 // FetchTags fetches the source from remote.
-func (r *Repository) FetchTags() *types.Cmd {
+func (r *Repository) FetchTags() *plugin_exec.Cmd {
 	args := []string{
 		"fetch",
 		"--tags",
@@ -38,25 +40,29 @@ func (r *Repository) FetchTags() *types.Cmd {
 		"origin",
 	}
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }
 
 // FetchLFS fetches lfs.
-func (r *Repository) FetchLFS() *types.Cmd {
+func (r *Repository) FetchLFS() *plugin_exec.Cmd {
 	args := []string{
 		"lfs",
 		"fetch",
 	}
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }
 
 // CheckoutHead handles head checkout.
-func (r *Repository) CheckoutHead() *types.Cmd {
+func (r *Repository) CheckoutHead() *plugin_exec.Cmd {
 	args := []string{
 		"checkout",
 		"--force",
@@ -64,13 +70,15 @@ func (r *Repository) CheckoutHead() *types.Cmd {
 		"FETCH_HEAD",
 	}
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }
 
 // CheckoutSha handles commit checkout.
-func (r *Repository) CheckoutSha() *types.Cmd {
+func (r *Repository) CheckoutSha() *plugin_exec.Cmd {
 	args := []string{
 		"reset",
 		"--hard",
@@ -78,19 +86,23 @@ func (r *Repository) CheckoutSha() *types.Cmd {
 		r.CommitSha,
 	}
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }
 
 // CheckoutLFS handles commit checkout.
-func (r *Repository) CheckoutLFS() *types.Cmd {
+func (r *Repository) CheckoutLFS() *plugin_exec.Cmd {
 	args := []string{
 		"lfs",
 		"checkout",
 	}
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }

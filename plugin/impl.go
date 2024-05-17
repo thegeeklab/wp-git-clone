@@ -11,9 +11,10 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"github.com/thegeeklab/wp-plugin-go/v2/file"
-	"github.com/thegeeklab/wp-plugin-go/v2/types"
-	"github.com/thegeeklab/wp-plugin-go/v2/util"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v3/file"
+	plugin_types "github.com/thegeeklab/wp-plugin-go/v3/types"
+	plugin_util "github.com/thegeeklab/wp-plugin-go/v3/util"
 )
 
 const (
@@ -73,8 +74,8 @@ func (p *Plugin) Validate() error {
 func (p *Plugin) Execute() error {
 	var err error
 
-	homeDir := util.GetUserHomeDir()
-	batchCmd := make([]*types.Cmd, 0)
+	homeDir := plugin_util.GetUserHomeDir()
+	batchCmd := make([]*plugin_exec.Cmd, 0)
 
 	fmt.Println(p.Settings.Repo.WorkDir)
 
@@ -83,12 +84,12 @@ func (p *Plugin) Execute() error {
 		return fmt.Errorf("failed to create working directory: %w", err)
 	}
 
-	p.Settings.Repo.IsEmpty, err = file.IsDirEmpty(p.Settings.Repo.WorkDir)
+	p.Settings.Repo.IsEmpty, err = plugin_file.IsDirEmpty(p.Settings.Repo.WorkDir)
 	if err != nil {
 		return fmt.Errorf("failed to check working directory: %w", err)
 	}
 
-	isDir, err := file.IsDir(filepath.Join(p.Settings.Repo.WorkDir, ".git"))
+	isDir, err := plugin_file.IsDir(filepath.Join(p.Settings.Repo.WorkDir, ".git"))
 	if err != nil {
 		return fmt.Errorf("failed to check working directory: %w", err)
 	}
@@ -175,7 +176,7 @@ func (p *Plugin) Execute() error {
 }
 
 func (p *Plugin) FlagsFromContext() error {
-	submodules, ok := p.Context.Generic("submodule-override").(*types.MapFlag)
+	submodules, ok := p.Context.Generic("submodule-override").(*plugin_types.MapFlag)
 	if !ok {
 		return fmt.Errorf("%w: failed to read submodule-override input", ErrTypeAssertionFailed)
 	}

@@ -2,14 +2,14 @@ package git
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
-	"github.com/thegeeklab/wp-plugin-go/v2/types"
-	"golang.org/x/sys/execabs"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 )
 
 // ConfigSSLVerify disables globally the git ssl verification.
-func (r *Repository) ConfigSSLVerify(skipVerify bool) *types.Cmd {
+func (r *Repository) ConfigSSLVerify(skipVerify bool) *plugin_exec.Cmd {
 	args := []string{
 		"config",
 		"--global",
@@ -17,13 +17,15 @@ func (r *Repository) ConfigSSLVerify(skipVerify bool) *types.Cmd {
 		strconv.FormatBool(!skipVerify),
 	}
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }
 
 // ConfigSafeDirectory disables globally the git ssl verification.
-func (r *Repository) ConfigSafeDirectory() *types.Cmd {
+func (r *Repository) ConfigSafeDirectory() *plugin_exec.Cmd {
 	args := []string{
 		"config",
 		"--global",
@@ -32,14 +34,16 @@ func (r *Repository) ConfigSafeDirectory() *types.Cmd {
 		r.SafeDirectory,
 	}
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }
 
 // ConfigRemapSubmodule returns a git command that, when executed configures git to
 // remap submodule urls.
-func (r *Repository) ConfigRemapSubmodule(name, url string) *types.Cmd {
+func (r *Repository) ConfigRemapSubmodule(name, url string) *plugin_exec.Cmd {
 	args := []string{
 		"config",
 		"--global",
@@ -47,13 +51,15 @@ func (r *Repository) ConfigRemapSubmodule(name, url string) *types.Cmd {
 		url,
 	}
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }
 
 // ConfigSSHCommand sets custom SSH key.
-func (r *Repository) ConfigSSHCommand(sshKey string) *types.Cmd {
+func (r *Repository) ConfigSSHCommand(sshKey string) *plugin_exec.Cmd {
 	args := []string{
 		"config",
 		"--global",
@@ -61,10 +67,8 @@ func (r *Repository) ConfigSSHCommand(sshKey string) *types.Cmd {
 		"ssh -i " + sshKey,
 	}
 
-	cmd := &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
-	cmd.SetTrace(false)
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Trace = false
 
 	return cmd
 }
