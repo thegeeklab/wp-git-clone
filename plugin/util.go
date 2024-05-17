@@ -9,8 +9,7 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/rs/zerolog/log"
-	"github.com/thegeeklab/wp-plugin-go/v2/types"
-	"golang.org/x/sys/execabs"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 )
 
 const (
@@ -35,13 +34,10 @@ func newBackoff(maxRetries uint64) backoff.BackOff {
 	return backoff.WithMaxRetries(b, maxRetries)
 }
 
-func retryCmd(cmd *types.Cmd) error {
+func retryCmd(cmd *plugin_exec.Cmd) error {
 	backoffOps := func() error {
 		// copy the original command
-		//nolint:gosec
-		retry := &types.Cmd{
-			Cmd: execabs.Command(cmd.Cmd.Path, cmd.Cmd.Args...),
-		}
+		retry := plugin_exec.Command(cmd.Cmd.Path, cmd.Cmd.Args...)
 		retry.Env = cmd.Env
 		retry.Stdout = cmd.Stdout
 		retry.Stderr = cmd.Stderr

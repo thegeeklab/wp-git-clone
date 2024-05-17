@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/thegeeklab/wp-git-clone/git"
-	wp "github.com/thegeeklab/wp-plugin-go/v2/plugin"
-	"github.com/thegeeklab/wp-plugin-go/v2/types"
+	plugin_base "github.com/thegeeklab/wp-plugin-go/v3/plugin"
+	plugin_types "github.com/thegeeklab/wp-plugin-go/v3/types"
 	"github.com/urfave/cli/v2"
 )
 
@@ -13,7 +13,7 @@ import (
 
 // Plugin implements provide the plugin.
 type Plugin struct {
-	*wp.Plugin
+	*plugin_base.Plugin
 	Settings *Settings
 }
 
@@ -36,15 +36,15 @@ type Settings struct {
 	Repo  git.Repository
 }
 
-func New(e wp.ExecuteFunc, build ...string) *Plugin {
+func New(e plugin_base.ExecuteFunc, build ...string) *Plugin {
 	p := &Plugin{
 		Settings: &Settings{},
 	}
 
-	options := wp.Options{
+	options := plugin_base.Options{
 		Name:                "wp-git-clone",
 		Description:         "Clone git repository",
-		Flags:               Flags(p.Settings, wp.FlagsPluginCategory),
+		Flags:               Flags(p.Settings, plugin_base.FlagsPluginCategory),
 		Execute:             p.run,
 		HideWoodpeckerFlags: true,
 	}
@@ -61,7 +61,7 @@ func New(e wp.ExecuteFunc, build ...string) *Plugin {
 		options.Execute = e
 	}
 
-	p.Plugin = wp.New(options)
+	p.Plugin = plugin_base.New(options)
 
 	return p
 }
@@ -164,7 +164,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Name:     "submodule-override",
 			Usage:    "JSON map of submodule overrides",
 			EnvVars:  []string{"PLUGIN_SUBMODULE_OVERRIDE"},
-			Value:    &types.MapFlag{},
+			Value:    &plugin_types.MapFlag{},
 			Category: category,
 		},
 		&cli.BoolFlag{

@@ -1,12 +1,13 @@
 package git
 
 import (
-	"github.com/thegeeklab/wp-plugin-go/v2/types"
-	"golang.org/x/sys/execabs"
+	"os"
+
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 )
 
 // RemoteAdd adds an additional remote to a git repo.
-func (r *Repository) RemoteAdd() *types.Cmd {
+func (r *Repository) RemoteAdd() *plugin_exec.Cmd {
 	args := []string{
 		"remote",
 		"add",
@@ -14,7 +15,9 @@ func (r *Repository) RemoteAdd() *types.Cmd {
 		r.RemoteURL,
 	}
 
-	return &types.Cmd{
-		Cmd: execabs.Command(gitBin, args...),
-	}
+	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }
