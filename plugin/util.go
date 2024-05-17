@@ -37,7 +37,6 @@ func newBackoff(maxRetries uint64) backoff.BackOff {
 func retryCmd(cmd *plugin_exec.Cmd) error {
 	backoffOps := func() error {
 		// copy the original command
-		//nolint:gosec
 		retry := plugin_exec.Command(cmd.Cmd.Path, cmd.Cmd.Args...)
 		retry.Env = cmd.Env
 		retry.Stdout = cmd.Stdout
