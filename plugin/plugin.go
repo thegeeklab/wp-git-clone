@@ -120,7 +120,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Name:        "netrc.username",
 			Usage:       "netrc username",
 			EnvVars:     []string{"CI_NETRC_USERNAME"},
-			Destination: &settings.Netrc.Password,
+			Destination: &settings.Netrc.Login,
 			Category:    category,
 		},
 		&cli.StringFlag{
