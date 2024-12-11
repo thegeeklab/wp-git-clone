@@ -3,7 +3,7 @@ package git
 import (
 	"os"
 
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v4/exec"
 )
 
 // RemoteRemove drops the defined remote from a git repo.

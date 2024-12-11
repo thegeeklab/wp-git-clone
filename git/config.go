@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v4/exec"
 )
 
 // ConfigSSLVerify disables globally the git ssl verification.
