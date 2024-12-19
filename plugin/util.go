@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cenkalti/backoff/v4"
+	"github.com/cenkalti/backoff/v5"
 	"github.com/rs/zerolog/log"
 	plugin_exec "github.com/thegeeklab/wp-plugin-go/v4/exec"
 )
