@@ -28,7 +28,6 @@ var (
 	ErrTypeAssertionFailed        = errors.New("type assertion failed")
 )
 
-//nolint:revive
 func (p *Plugin) run(ctx context.Context) error {
 	if err := p.FlagsFromContext(); err != nil {
 		return fmt.Errorf("validation failed: %w", err)
@@ -38,7 +37,7 @@ func (p *Plugin) run(ctx context.Context) error {
 		return fmt.Errorf("validation failed: %w", err)
 	}
 
-	if err := p.Execute(); err != nil {
+	if err := p.Execute(ctx); err != nil {
 		return fmt.Errorf("execution failed: %w", err)
 	}
 
@@ -71,7 +70,7 @@ func (p *Plugin) Validate() error {
 }
 
 // Execute provides the implementation of the plugin.
-func (p *Plugin) Execute() error {
+func (p *Plugin) Execute(ctx context.Context) error {
 	var err error
 
 	homeDir := plugin_util.GetUserHomeDir()
@@ -166,7 +165,7 @@ func (p *Plugin) Execute() error {
 
 		switch {
 		case err != nil && shouldRetry(buf.String()):
-			return retryCmd(cmd)
+			return retryCmd(ctx, cmd)
 		case err != nil:
 			return err
 		}

@@ -43,7 +43,7 @@ func TestClone(t *testing.T) {
 			Lfs:       tt.lfs,
 		}
 
-		if err := plugin.Execute(); err != nil {
+		if err := plugin.Execute(context.Background()); err != nil {
 			t.Errorf("Expected successful clone. Got error. %s.", err)
 		}
 
@@ -85,7 +85,7 @@ func TestCloneNonEmpty(t *testing.T) {
 			Lfs:       tt.lfs,
 		}
 
-		if err := plugin.Execute(); err != nil {
+		if err := plugin.Execute(context.Background()); err != nil {
 			t.Errorf("Expected successful clone. Got error. %s.", err)
 		}
 

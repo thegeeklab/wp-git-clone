@@ -1,13 +1,14 @@
 package plugin
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/cenkalti/backoff/v4"
+	"github.com/cenkalti/backoff/v5"
 	"github.com/rs/zerolog/log"
 	plugin_exec "github.com/thegeeklab/wp-plugin-go/v4/exec"
 )
@@ -26,16 +27,12 @@ func shouldRetry(s string) bool {
 	return strings.Contains(s, "find remote ref")
 }
 
-func newBackoff(maxRetries uint64) backoff.BackOff {
-	b := backoff.NewExponentialBackOff()
-	b.InitialInterval = daemonBackoffInitialInterval
-	b.Multiplier = daemonBackoffMultiplier
+func retryCmd(ctx context.Context, cmd *plugin_exec.Cmd) error {
+	bf := backoff.NewExponentialBackOff()
+	bf.InitialInterval = daemonBackoffInitialInterval
+	bf.Multiplier = daemonBackoffMultiplier
 
-	return backoff.WithMaxRetries(b, maxRetries)
-}
-
-func retryCmd(cmd *plugin_exec.Cmd) error {
-	backoffOps := func() error {
+	bfOpts := func() (any, error) {
 		// copy the original command
 		retry := plugin_exec.Command(cmd.Cmd.Path, cmd.Cmd.Args...)
 		retry.Env = cmd.Env
@@ -43,13 +40,19 @@ func retryCmd(cmd *plugin_exec.Cmd) error {
 		retry.Stderr = cmd.Stderr
 		retry.Dir = cmd.Dir
 
-		return retry.Run()
+		return nil, retry.Run()
 	}
-	backoffLog := func(err error, delay time.Duration) {
+
+	bfNotify := func(err error, delay time.Duration) {
 		log.Error().Msgf("failed to find remote ref: %v: retry in %s", err, delay.Truncate(time.Second))
 	}
 
-	return backoff.RetryNotify(backoffOps, newBackoff(daemonBackoffMaxRetries), backoffLog)
+	_, err := backoff.Retry(ctx, bfOpts,
+		backoff.WithBackOff(bf),
+		backoff.WithMaxTries(daemonBackoffMaxRetries),
+		backoff.WithNotify(bfNotify))
+
+	return err
 }
 
 // WriteNetrc writes the netrc file.
