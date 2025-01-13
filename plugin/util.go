@@ -32,7 +32,7 @@ func retryCmd(ctx context.Context, cmd *plugin_exec.Cmd) error {
 	bf.InitialInterval = daemonBackoffInitialInterval
 	bf.Multiplier = daemonBackoffMultiplier
 
-	bfOpts := func() (any, error) {
+	bfo := func() (any, error) {
 		// copy the original command
 		retry := plugin_exec.Command(cmd.Cmd.Path, cmd.Cmd.Args...)
 		retry.Env = cmd.Env
@@ -43,14 +43,14 @@ func retryCmd(ctx context.Context, cmd *plugin_exec.Cmd) error {
 		return nil, retry.Run()
 	}
 
-	bfNotify := func(err error, delay time.Duration) {
+	bfn := func(err error, delay time.Duration) {
 		log.Error().Msgf("failed to find remote ref: %v: retry in %s", err, delay.Truncate(time.Second))
 	}
 
-	_, err := backoff.Retry(ctx, bfOpts,
+	_, err := backoff.Retry(ctx, bfo,
 		backoff.WithBackOff(bf),
 		backoff.WithMaxTries(daemonBackoffMaxRetries),
-		backoff.WithNotify(bfNotify))
+		backoff.WithNotify(bfn))
 
 	return err
 }
