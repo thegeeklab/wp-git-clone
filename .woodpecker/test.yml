@@ -7,12 +7,12 @@ when:
 
 steps:
   - name: lint
-    image: docker.io/library/golang:1.23.4
+    image: docker.io/library/golang:1.23.5
     commands:
       - make lint
 
   - name: test
-    image: docker.io/library/golang:1.23.4
+    image: docker.io/library/golang:1.23.5
     commands:
       - apt-get update
       - apt-get install -y --no-install-recommends git git-lfs
