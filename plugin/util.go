@@ -34,7 +34,7 @@ func retryCmd(ctx context.Context, cmd *plugin_exec.Cmd) error {
 
 	bfo := func() (any, error) {
 		// copy the original command
-		retry := plugin_exec.Command(cmd.Cmd.Path, cmd.Cmd.Args...)
+		retry := plugin_exec.Command(cmd.Path, cmd.Args...)
 		retry.Env = cmd.Env
 		retry.Stdout = cmd.Stdout
 		retry.Stderr = cmd.Stderr
