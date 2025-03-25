@@ -30,7 +30,7 @@ func TestConfigSSLVerify(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.ConfigSSLVerify(tt.skipVerify)
-			assert.Equal(t, tt.want, cmd.Cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }
@@ -54,7 +54,7 @@ func TestConfigSafeDirectory(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.ConfigSafeDirectory()
-			assert.Equal(t, tt.want, cmd.Cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }
@@ -92,7 +92,7 @@ func TestConfigRemapSubmodule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.ConfigRemapSubmodule(tt.subName, tt.subURL)
-			assert.Equal(t, tt.want, cmd.Cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }
@@ -115,7 +115,7 @@ func TestConfigSSHCommand(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.ConfigSSHCommand(tt.sshKey)
-			assert.Equal(t, tt.want, cmd.Cmd.Args)
+			assert.Equal(t, tt.want, cmd.Args)
 		})
 	}
 }
