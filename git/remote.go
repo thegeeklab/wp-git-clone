@@ -3,7 +3,7 @@ package git
 import (
 	"os"
 
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v4/exec"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v5/exec"
 )
 
 // RemoteAdd adds an additional remote to a git repo.

@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v4/exec"
-	plugin_file "github.com/thegeeklab/wp-plugin-go/v4/file"
-	plugin_types "github.com/thegeeklab/wp-plugin-go/v4/types"
-	plugin_util "github.com/thegeeklab/wp-plugin-go/v4/util"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v5/exec"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v5/file"
+	plugin_types "github.com/thegeeklab/wp-plugin-go/v5/types"
+	plugin_util "github.com/thegeeklab/wp-plugin-go/v5/util"
 )
 
 const (
