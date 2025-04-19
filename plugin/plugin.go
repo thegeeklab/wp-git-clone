@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/thegeeklab/wp-git-clone/git"
-	plugin_base "github.com/thegeeklab/wp-plugin-go/v4/plugin"
-	plugin_types "github.com/thegeeklab/wp-plugin-go/v4/types"
+	plugin_cli "github.com/thegeeklab/wp-plugin-go/v6/cli"
+	plugin_base "github.com/thegeeklab/wp-plugin-go/v6/plugin"
 	"github.com/urfave/cli/v3"
 )
 
@@ -72,7 +72,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "remote",
 			Usage:       "git remote HTTP clone url",
-			EnvVars:     []string{"PLUGIN_REMOTE", "CI_REPO_CLONE_URL"},
+			Sources:     cli.EnvVars("PLUGIN_REMOTE", "CI_REPO_CLONE_URL"),
 			Destination: &settings.Repo.RemoteURL,
 			DefaultText: "$CI_REPO_CLONE_URL",
 			Category:    category,
@@ -80,7 +80,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "remote-ssh",
 			Usage:       "git remote SSH clone url",
-			EnvVars:     []string{"PLUGIN_REMOTE_SSH", "CI_REPO_CLONE_SSH_URL"},
+			Sources:     cli.EnvVars("PLUGIN_REMOTE_SSH", "CI_REPO_CLONE_SSH_URL"),
 			Destination: &settings.Repo.RemoteSSH,
 			DefaultText: "$CI_REPO_CLONE_SSH_URL",
 			Category:    category,
@@ -88,7 +88,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "workdir",
 			Usage:       "path to clone git repository",
-			EnvVars:     []string{"PLUGIN_WORKDIR", "CI_WORKSPACE"},
+			Sources:     cli.EnvVars("PLUGIN_WORKDIR", "CI_WORKSPACE"),
 			Destination: &settings.Repo.WorkDir,
 			DefaultText: "$CI_WORKSPACE",
 			Category:    category,
@@ -96,7 +96,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "sha",
 			Usage:       "git commit sha",
-			EnvVars:     []string{"PLUGIN_COMMIT_SHA", "CI_COMMIT_SHA"},
+			Sources:     cli.EnvVars("PLUGIN_COMMIT_SHA", "CI_COMMIT_SHA"),
 			Destination: &settings.Repo.CommitSha,
 			DefaultText: "$CI_COMMIT_SHA",
 			Category:    category,
@@ -104,7 +104,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "ref",
 			Usage:       "git commit ref",
-			EnvVars:     []string{"PLUGIN_COMMIT_REF", "CI_COMMIT_REF"},
+			Sources:     cli.EnvVars("PLUGIN_COMMIT_REF", "CI_COMMIT_REF"),
 			Value:       "refs/heads/main",
 			Destination: &settings.Repo.CommitRef,
 			Category:    category,
@@ -112,35 +112,35 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "netrc.machine",
 			Usage:       "netrc machine",
-			EnvVars:     []string{"CI_NETRC_MACHINE"},
+			Sources:     cli.EnvVars("CI_NETRC_MACHINE"),
 			Destination: &settings.Netrc.Machine,
 			Category:    category,
 		},
 		&cli.StringFlag{
 			Name:        "netrc.username",
 			Usage:       "netrc username",
-			EnvVars:     []string{"CI_NETRC_USERNAME"},
+			Sources:     cli.EnvVars("CI_NETRC_USERNAME"),
 			Destination: &settings.Netrc.Login,
 			Category:    category,
 		},
 		&cli.StringFlag{
 			Name:        "netrc.password",
 			Usage:       "netrc password",
-			EnvVars:     []string{"CI_NETRC_PASSWORD"},
+			Sources:     cli.EnvVars("CI_NETRC_PASSWORD"),
 			Destination: &settings.Netrc.Password,
 			Category:    category,
 		},
-		&cli.IntFlag{
+		&plugin_cli.IntFlag{
 			Name:        "depth",
 			Usage:       "clone depth",
-			EnvVars:     []string{"PLUGIN_DEPTH"},
+			Sources:     cli.EnvVars("PLUGIN_DEPTH"),
 			Destination: &settings.Repo.Depth,
 			Category:    category,
 		},
 		&cli.BoolFlag{
 			Name:        "recursive",
 			Usage:       "clone submodules",
-			EnvVars:     []string{"PLUGIN_RECURSIVE"},
+			Sources:     cli.EnvVars("PLUGIN_RECURSIVE"),
 			Value:       true,
 			Destination: &settings.Recursive,
 			Category:    category,
@@ -148,7 +148,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tags",
 			Usage:       "fetch git tags during clone",
-			EnvVars:     []string{"PLUGIN_TAGS"},
+			Sources:     cli.EnvVars("PLUGIN_TAGS"),
 			Value:       true,
 			Destination: &settings.Tags,
 			Category:    category,
@@ -156,21 +156,21 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "submodule-update-remote",
 			Usage:       "update remote submodules",
-			EnvVars:     []string{"PLUGIN_SUBMODULES_UPDATE_REMOTE", "PLUGIN_SUBMODULE_UPDATE_REMOTE"},
+			Sources:     cli.EnvVars("PLUGIN_SUBMODULES_UPDATE_REMOTE", "PLUGIN_SUBMODULE_UPDATE_REMOTE"),
 			Destination: &settings.Repo.SubmoduleRemote,
 			Category:    category,
 		},
-		&cli.GenericFlag{
-			Name:     "submodule-override",
-			Usage:    "JSON map of submodule overrides",
-			EnvVars:  []string{"PLUGIN_SUBMODULE_OVERRIDE"},
-			Value:    &plugin_types.MapFlag{},
-			Category: category,
+		&plugin_cli.MapFlag{
+			Name:        "submodule-override",
+			Usage:       "JSON map of submodule overrides",
+			Sources:     cli.EnvVars("PLUGIN_SUBMODULE_OVERRIDE"),
+			Destination: &settings.Repo.Submodules,
+			Category:    category,
 		},
 		&cli.BoolFlag{
 			Name:        "submodule-partial",
 			Usage:       "update submodules via partial clone (`depth=1`)",
-			EnvVars:     []string{"PLUGIN_SUBMODULES_PARTIAL", "PLUGIN_SUBMODULE_PARTIAL"},
+			Sources:     cli.EnvVars("PLUGIN_SUBMODULES_PARTIAL", "PLUGIN_SUBMODULE_PARTIAL"),
 			Value:       true,
 			Destination: &settings.Repo.SubmodulePartial,
 			Category:    category,
@@ -178,7 +178,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "lfs",
 			Usage:       "whether to retrieve LFS content if available",
-			EnvVars:     []string{"PLUGIN_LFS"},
+			Sources:     cli.EnvVars("PLUGIN_LFS"),
 			Value:       true,
 			Destination: &settings.Lfs,
 			Category:    category,
@@ -186,21 +186,21 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "branch",
 			Usage:       "change branch name",
-			EnvVars:     []string{"PLUGIN_BRANCH", "CI_COMMIT_BRANCH", "CI_REPO_DEFAULT_BRANCH"},
+			Sources:     cli.EnvVars("PLUGIN_BRANCH", "CI_COMMIT_BRANCH", "CI_REPO_DEFAULT_BRANCH"),
 			Destination: &settings.Repo.Branch,
 			Category:    category,
 		},
 		&cli.BoolFlag{
 			Name:        "partial",
 			Usage:       "enable/disable partial clone",
-			EnvVars:     []string{"PLUGIN_PARTIAL"},
+			Sources:     cli.EnvVars("PLUGIN_PARTIAL"),
 			Destination: &settings.Partial,
 			Category:    category,
 		},
 		&cli.StringFlag{
 			Name:        "safe-directory",
 			Usage:       "define/replace safe directories",
-			EnvVars:     []string{"PLUGIN_SAFE_DIRECTORY", "CI_WORKSPACE"},
+			Sources:     cli.EnvVars("PLUGIN_SAFE_DIRECTORY", "CI_WORKSPACE"),
 			Destination: &settings.Repo.SafeDirectory,
 			DefaultText: "$CI_WORKSPACE",
 			Category:    category,
@@ -208,7 +208,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "ssh-key",
 			Usage:       "private key for SSH clone",
-			EnvVars:     []string{"PLUGIN_SSH_KEY"},
+			Sources:     cli.EnvVars("PLUGIN_SSH_KEY"),
 			Destination: &settings.SSHKey,
 			Category:    category,
 		},

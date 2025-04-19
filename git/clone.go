@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v4/exec"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v6/exec"
 )
 
 // FetchSource fetches the source from remote.
