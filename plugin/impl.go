@@ -11,10 +11,9 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v4/exec"
-	plugin_file "github.com/thegeeklab/wp-plugin-go/v4/file"
-	plugin_types "github.com/thegeeklab/wp-plugin-go/v4/types"
-	plugin_util "github.com/thegeeklab/wp-plugin-go/v4/util"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v6/exec"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v6/file"
+	plugin_util "github.com/thegeeklab/wp-plugin-go/v6/util"
 )
 
 const (
@@ -29,10 +28,6 @@ var (
 )
 
 func (p *Plugin) run(ctx context.Context) error {
-	if err := p.FlagsFromContext(); err != nil {
-		return fmt.Errorf("validation failed: %w", err)
-	}
-
 	if err := p.Validate(); err != nil {
 		return fmt.Errorf("validation failed: %w", err)
 	}
@@ -170,17 +165,6 @@ func (p *Plugin) Execute(ctx context.Context) error {
 			return err
 		}
 	}
-
-	return nil
-}
-
-func (p *Plugin) FlagsFromContext() error {
-	submodules, ok := p.Context.Generic("submodule-override").(*plugin_types.MapFlag)
-	if !ok {
-		return fmt.Errorf("%w: failed to read submodule-override input", ErrTypeAssertionFailed)
-	}
-
-	p.Settings.Repo.Submodules = submodules.Get()
 
 	return nil
 }
