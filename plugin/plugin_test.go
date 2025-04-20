@@ -40,7 +40,7 @@ func Test_pluginOptions(t *testing.T) {
 		}
 
 		got, _ := setupPluginTest(t)
-		got.Validate()
+		_ = got.Validate()
 
 		assert.EqualValues(t, tt.want, got.Settings.Repo.Branch)
 	}
