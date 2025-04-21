@@ -130,7 +130,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Netrc.Password,
 			Category:    category,
 		},
-		&plugin_cli.IntFlag{
+		&cli.IntFlag{
 			Name:        "depth",
 			Usage:       "clone depth",
 			Sources:     cli.EnvVars("PLUGIN_DEPTH"),
