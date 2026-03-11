@@ -18,6 +18,7 @@ LABEL org.opencontainers.image.source="https://github.com/thegeeklab/wp-git-clon
 LABEL org.opencontainers.image.documentation="https://github.com/thegeeklab/wp-git-clone"
 
 RUN apk --update add --no-cache git openssh curl git-lfs && \
+    apk upgrade --no-cache zlib && \
     rm -rf /var/cache/apk/* && \
     rm -rf /tmp/*
 
