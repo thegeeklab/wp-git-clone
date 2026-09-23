@@ -30,6 +30,7 @@ func TestClone(t *testing.T) {
 		defer teardown(dir)
 
 		plugin := New(func(_ context.Context) error { return nil })
+		_ = plugin.App.Run(t.Context(), []string{"wp-git-clone"})
 		plugin.Settings = &Settings{
 			Repo: git.Repository{
 				RemoteURL: tt.clone,
@@ -72,6 +73,7 @@ func TestCloneNonEmpty(t *testing.T) {
 
 	for _, tt := range getCommits() {
 		plugin := New(func(_ context.Context) error { return nil })
+		_ = plugin.App.Run(t.Context(), []string{"wp-git-clone"})
 		plugin.Settings = &Settings{
 			Repo: git.Repository{
 				RemoteURL: tt.clone,

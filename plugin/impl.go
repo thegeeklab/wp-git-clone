@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v6/exec"
-	plugin_file "github.com/thegeeklab/wp-plugin-go/v6/file"
-	plugin_util "github.com/thegeeklab/wp-plugin-go/v6/util"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v7/exec"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v7/file"
+	plugin_util "github.com/thegeeklab/wp-plugin-go/v7/util"
 )
 
 const (
@@ -66,7 +66,10 @@ func (p *Plugin) Validate() error {
 
 // Execute provides the implementation of the plugin.
 func (p *Plugin) Execute(ctx context.Context) error {
-	var err error
+	network, err := p.GetNetwork()
+	if err != nil {
+		return fmt.Errorf("error while getting network configuration: %w", err)
+	}
 
 	homeDir := plugin_util.GetUserHomeDir()
 	batchCmd := make([]*plugin_exec.Cmd, 0)
@@ -97,7 +100,7 @@ func (p *Plugin) Execute(ctx context.Context) error {
 		}
 	}
 
-	batchCmd = append(batchCmd, p.Settings.Repo.ConfigSSLVerify(p.Network.InsecureSkipVerify))
+	batchCmd = append(batchCmd, p.Settings.Repo.ConfigSSLVerify(network.InsecureSkipVerify))
 
 	netrc := p.Settings.Netrc
 	if err := WriteNetrc(homeDir, netrc.Machine, netrc.Login, netrc.Password); err != nil {
