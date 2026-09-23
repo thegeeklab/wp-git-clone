@@ -4,7 +4,6 @@ properties:
     description: |
       Change branch name.
     type: string
-    defaultValue: "main"
     required: false
 
   - name: commit_ref
@@ -31,8 +30,6 @@ properties:
   - name: insecure_skip_verify
     description: |
       Skip SSL verification.
-
-      Activating this option is insecure and should be avoided in most cases.
     type: bool
     defaultValue: false
     required: false
@@ -95,7 +92,7 @@ properties:
   - name: submodule_override
     description: |
       JSON map of submodule overrides.
-    type: generic
+    type: dict
     required: false
 
   - name: submodules_partial

@@ -3,7 +3,7 @@ package git
 import (
 	"os"
 
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v6/exec"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v7/exec"
 )
 
 // SubmoduleUpdate recursively initializes and updates submodules.

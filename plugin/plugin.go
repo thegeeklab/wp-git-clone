@@ -2,14 +2,15 @@ package plugin
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/thegeeklab/wp-git-clone/git"
-	plugin_cli "github.com/thegeeklab/wp-plugin-go/v6/cli"
-	plugin_base "github.com/thegeeklab/wp-plugin-go/v6/plugin"
+	plugin_cli "github.com/thegeeklab/wp-plugin-go/v7/cli"
+	plugin_base "github.com/thegeeklab/wp-plugin-go/v7/plugin"
 	"github.com/urfave/cli/v3"
 )
 
-//go:generate go run ../internal/doc/main.go -output=../docs/data/data-raw.yaml
+//go:generate go run ../hack/docs-gen/main.go -output=../docs/data/data.yaml
 
 // Plugin implements provide the plugin.
 type Plugin struct {
@@ -42,9 +43,13 @@ func New(e plugin_base.ExecuteFunc, build ...string) *Plugin {
 	}
 
 	options := plugin_base.Options{
-		Name:                "wp-git-clone",
-		Description:         "Clone git repository",
-		Flags:               Flags(p.Settings, plugin_base.FlagsPluginCategory),
+		Name:        "wp-git-clone",
+		Description: "Clone git repository",
+		Flags: slices.Concat(
+			plugin_base.LoggingFlags(plugin_base.FlagsPluginCategory),
+			plugin_base.NetworkFlags(plugin_base.FlagsPluginCategory),
+			Flags(p.Settings, plugin_base.FlagsPluginCategory),
+		),
 		Execute:             p.run,
 		HideWoodpeckerFlags: true,
 	}
@@ -69,6 +74,7 @@ func New(e plugin_base.ExecuteFunc, build ...string) *Plugin {
 // Flags returns a slice of CLI flags for the plugin.
 func Flags(settings *Settings, category string) []cli.Flag {
 	return []cli.Flag{
+		// Git remote HTTP clone url.
 		&cli.StringFlag{
 			Name:        "remote",
 			Usage:       "git remote HTTP clone url",
@@ -77,6 +83,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			DefaultText: "$CI_REPO_CLONE_URL",
 			Category:    category,
 		},
+		// Git remote SSH clone url.
 		&cli.StringFlag{
 			Name:        "remote-ssh",
 			Usage:       "git remote SSH clone url",
@@ -85,6 +92,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			DefaultText: "$CI_REPO_CLONE_SSH_URL",
 			Category:    category,
 		},
+		// Path to clone git repository.
 		&cli.StringFlag{
 			Name:        "workdir",
 			Usage:       "path to clone git repository",
@@ -93,6 +101,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			DefaultText: "$CI_WORKSPACE",
 			Category:    category,
 		},
+		// Git commit sha.
 		&cli.StringFlag{
 			Name:        "sha",
 			Usage:       "git commit sha",
@@ -101,6 +110,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			DefaultText: "$CI_COMMIT_SHA",
 			Category:    category,
 		},
+		// Git commit ref.
 		&cli.StringFlag{
 			Name:        "ref",
 			Usage:       "git commit ref",
@@ -130,6 +140,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Netrc.Password,
 			Category:    category,
 		},
+		// Clone depth.
 		&cli.IntFlag{
 			Name:        "depth",
 			Usage:       "clone depth",
@@ -137,6 +148,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Repo.Depth,
 			Category:    category,
 		},
+		// Clone submodules.
 		&cli.BoolFlag{
 			Name:        "recursive",
 			Usage:       "clone submodules",
@@ -145,6 +157,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Recursive,
 			Category:    category,
 		},
+		// Fetch git tags during clone.
 		&cli.BoolFlag{
 			Name:        "tags",
 			Usage:       "fetch git tags during clone",
@@ -153,6 +166,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Tags,
 			Category:    category,
 		},
+		// Update remote submodules.
 		&cli.BoolFlag{
 			Name:        "submodule-update-remote",
 			Usage:       "update remote submodules",
@@ -160,6 +174,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Repo.SubmoduleRemote,
 			Category:    category,
 		},
+		// JSON map of submodule overrides.
 		&plugin_cli.MapFlag{
 			Name:        "submodule-override",
 			Usage:       "JSON map of submodule overrides",
@@ -167,6 +182,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Repo.Submodules,
 			Category:    category,
 		},
+		// Update submodules via partial clone (`depth=1`).
 		&cli.BoolFlag{
 			Name:        "submodule-partial",
 			Usage:       "update submodules via partial clone (`depth=1`)",
@@ -175,6 +191,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Repo.SubmodulePartial,
 			Category:    category,
 		},
+		// Whether to retrieve LFS content if available.
 		&cli.BoolFlag{
 			Name:        "lfs",
 			Usage:       "whether to retrieve LFS content if available",
@@ -183,6 +200,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Lfs,
 			Category:    category,
 		},
+		// Change branch name.
 		&cli.StringFlag{
 			Name:        "branch",
 			Usage:       "change branch name",
@@ -190,6 +208,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Repo.Branch,
 			Category:    category,
 		},
+		// Enable/disable partial clone.
 		&cli.BoolFlag{
 			Name:        "partial",
 			Usage:       "enable/disable partial clone",
@@ -197,6 +216,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Partial,
 			Category:    category,
 		},
+		// Define/replace safe directories.
 		&cli.StringFlag{
 			Name:        "safe-directory",
 			Usage:       "define/replace safe directories",
@@ -205,6 +225,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			DefaultText: "$CI_WORKSPACE",
 			Category:    category,
 		},
+		// Private key for SSH clone.
 		&cli.StringFlag{
 			Name:        "ssh-key",
 			Usage:       "private key for SSH clone",
