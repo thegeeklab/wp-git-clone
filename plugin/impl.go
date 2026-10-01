@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v7/exec"
-	plugin_file "github.com/thegeeklab/wp-plugin-go/v7/file"
-	plugin_util "github.com/thegeeklab/wp-plugin-go/v7/util"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v8/exec"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v8/file"
+	plugin_util "github.com/thegeeklab/wp-plugin-go/v8/util"
 )
 
 const (
