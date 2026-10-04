@@ -7,7 +7,7 @@ import (
 )
 
 func TestFetchSource(t *testing.T) {
-	testdata := []struct {
+	tests := []struct {
 		name  string
 		repo  *Repository
 		tags  bool
@@ -62,7 +62,7 @@ func TestFetchSource(t *testing.T) {
 		},
 	}
 
-	for _, tt := range testdata {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.FetchSource(tt.repo.CommitRef)
 			assert.Equal(t, tt.want, cmd.Args)
@@ -71,7 +71,7 @@ func TestFetchSource(t *testing.T) {
 }
 
 func TestFetchTags(t *testing.T) {
-	testdata := []struct {
+	tests := []struct {
 		name  string
 		repo  *Repository
 		tags  bool
@@ -92,7 +92,7 @@ func TestFetchTags(t *testing.T) {
 		},
 	}
 
-	for _, tt := range testdata {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.FetchTags()
 			assert.Equal(t, tt.want, cmd.Args)
@@ -101,7 +101,7 @@ func TestFetchTags(t *testing.T) {
 }
 
 func TestFetchLFS(t *testing.T) {
-	testdata := []struct {
+	tests := []struct {
 		name string
 		repo *Repository
 		want []string
@@ -117,7 +117,7 @@ func TestFetchLFS(t *testing.T) {
 		},
 	}
 
-	for _, tt := range testdata {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.FetchLFS()
 			assert.Equal(t, tt.want, cmd.Args)
@@ -126,7 +126,7 @@ func TestFetchLFS(t *testing.T) {
 }
 
 func TestCheckoutHead(t *testing.T) {
-	testdata := []struct {
+	tests := []struct {
 		name string
 		repo *Repository
 		want []string
@@ -144,7 +144,7 @@ func TestCheckoutHead(t *testing.T) {
 		},
 	}
 
-	for _, tt := range testdata {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.CheckoutHead()
 			assert.Equal(t, tt.want, cmd.Args)
@@ -153,7 +153,7 @@ func TestCheckoutHead(t *testing.T) {
 }
 
 func TestCheckoutSha(t *testing.T) {
-	testdata := []struct {
+	tests := []struct {
 		name string
 		repo *Repository
 		want []string
@@ -173,7 +173,7 @@ func TestCheckoutSha(t *testing.T) {
 		},
 	}
 
-	for _, tt := range testdata {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.CheckoutSha()
 			assert.Equal(t, tt.want, cmd.Args)
@@ -182,7 +182,7 @@ func TestCheckoutSha(t *testing.T) {
 }
 
 func TestCheckoutLFS(t *testing.T) {
-	testdata := []struct {
+	tests := []struct {
 		name string
 		repo *Repository
 		want []string
@@ -198,7 +198,7 @@ func TestCheckoutLFS(t *testing.T) {
 		},
 	}
 
-	for _, tt := range testdata {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.repo.CheckoutLFS()
 			assert.Equal(t, tt.want, cmd.Args)
