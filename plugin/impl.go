@@ -3,7 +3,6 @@ package plugin
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -20,11 +19,6 @@ const (
 	daemonBackoffMaxRetries      = 3
 	daemonBackoffInitialInterval = 2 * time.Second
 	daemonBackoffMultiplier      = 3.5
-)
-
-var (
-	ErrGitCloneDestintionNotValid = errors.New("destination not valid")
-	ErrTypeAssertionFailed        = errors.New("type assertion failed")
 )
 
 func (p *Plugin) run(ctx context.Context) error {
@@ -73,8 +67,6 @@ func (p *Plugin) Execute(ctx context.Context) error {
 
 	homeDir := plugin_util.GetUserHomeDir()
 	batchCmd := make([]*plugin_exec.Cmd, 0)
-
-	fmt.Println(p.Settings.Repo.WorkDir)
 
 	// Handle repo initialization.
 	if err := os.MkdirAll(p.Settings.Repo.WorkDir, os.ModePerm); err != nil {
