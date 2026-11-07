@@ -26,6 +26,7 @@ func TestRemoteAdd(t *testing.T) {
 			cmd := tt.repo.RemoteAdd()
 			assert.Equal(t, tt.want, cmd.Args)
 			assert.Equal(t, tt.repo.WorkDir, cmd.Dir)
+			assert.False(t, cmd.Trace)
 		})
 	}
 }

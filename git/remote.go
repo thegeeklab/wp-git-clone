@@ -16,6 +16,7 @@ func (r *Repository) RemoteAdd() *plugin_exec.Cmd {
 	}
 
 	cmd := plugin_exec.Command(gitBin, args...)
+	cmd.Trace = false
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 

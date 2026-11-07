@@ -55,6 +55,44 @@ func (p *Plugin) Validate() error {
 		p.Settings.Repo.Filter = "tree:0"
 	}
 
+	if err := validateBranch(p.Settings.Repo.Branch); err != nil {
+		return err
+	}
+
+	if err := validateCommitRef(p.Settings.Repo.CommitRef); err != nil {
+		return err
+	}
+
+	if err := validateCommitSha(p.Settings.Repo.CommitSha); err != nil {
+		return err
+	}
+
+	if err := validateFilter(p.Settings.Repo.Filter); err != nil {
+		return err
+	}
+
+	if err := validateRemoteURL(p.Settings.Repo.RemoteURL); err != nil {
+		return err
+	}
+
+	if err := validateSafeDirectory(p.Settings.Repo.SafeDirectory); err != nil {
+		return err
+	}
+
+	if err := validateSSHKey(p.Settings.SSHKey); err != nil {
+		return err
+	}
+
+	if err := validateNetrc(p.Settings.Netrc); err != nil {
+		return err
+	}
+
+	for name, url := range p.Settings.Repo.Submodules {
+		if err := validateSubmodule(name, url); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -66,6 +104,13 @@ func (p *Plugin) Execute(ctx context.Context) error {
 	}
 
 	homeDir := plugin_util.GetUserHomeDir()
+
+	if p.Settings.Home != "" {
+		if info, err := os.Stat(p.Settings.Home); err == nil && info.IsDir() {
+			homeDir = p.Settings.Home
+		}
+	}
+
 	batchCmd := make([]*plugin_exec.Cmd, 0)
 
 	// Handle repo initialization.
@@ -86,10 +131,6 @@ func (p *Plugin) Execute(ctx context.Context) error {
 	if !isDir {
 		batchCmd = append(batchCmd, p.Settings.Repo.Init())
 		batchCmd = append(batchCmd, p.Settings.Repo.RemoteAdd())
-
-		if p.Settings.SSHKey != "" {
-			batchCmd = append(batchCmd, p.Settings.Repo.ConfigSSHCommand(p.Settings.SSHKey))
-		}
 	}
 
 	batchCmd = append(batchCmd, p.Settings.Repo.ConfigSSLVerify(network.InsecureSkipVerify))
@@ -97,6 +138,12 @@ func (p *Plugin) Execute(ctx context.Context) error {
 	netrc := p.Settings.Netrc
 	if err := WriteNetrc(homeDir, netrc.Machine, netrc.Login, netrc.Password); err != nil {
 		return err
+	}
+
+	if p.Settings.SSHKey != "" {
+		if err := WriteSSHConfig(homeDir, p.Settings.SSHKey); err != nil {
+			return err
+		}
 	}
 
 	// Handle clone

@@ -53,18 +53,3 @@ func (r *Repository) ConfigRemapSubmodule(name, url string) *plugin_exec.Cmd {
 
 	return cmd
 }
-
-// ConfigSSHCommand sets custom SSH key.
-func (r *Repository) ConfigSSHCommand(sshKey string) *plugin_exec.Cmd {
-	args := []string{
-		"config",
-		"--global",
-		"core.sshCommand",
-		"ssh -i " + sshKey,
-	}
-
-	cmd := plugin_exec.Command(gitBin, args...)
-	cmd.Trace = false
-
-	return cmd
-}
