@@ -22,7 +22,7 @@ func (r *Repository) ConfigSSLVerify(skipVerify bool) *plugin_exec.Cmd {
 	return cmd
 }
 
-// ConfigSafeDirectory disables globally the git ssl verification.
+// ConfigSafeDirectory sets a safe directory globally.
 func (r *Repository) ConfigSafeDirectory() *plugin_exec.Cmd {
 	args := []string{
 		"config",

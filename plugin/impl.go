@@ -182,18 +182,8 @@ func (p *Plugin) Execute(ctx context.Context) error {
 
 		buf := new(bytes.Buffer)
 
-		// Don' set GIT_TERMINAL_PROMPT=0 as it prevents git from loading .netrc
-		defaultEnvVars := []string{
-			"GIT_LFS_SKIP_SMUDGE=1", // prevents git-lfs from retrieving any LFS files
-		}
-
-		if p.Settings.Home != "" {
-			if _, err := os.Stat(p.Settings.Home); !os.IsNotExist(err) {
-				defaultEnvVars = append(defaultEnvVars, fmt.Sprintf("HOME=%s", p.Settings.Home))
-			}
-		}
-
-		cmd.Env = append(os.Environ(), defaultEnvVars...)
+		// Don't set GIT_TERMINAL_PROMPT=0 as it prevents git from loading .netrc
+		cmd.Env = append(os.Environ(), p.getEnvVars()...)
 		cmd.Stdout = io.MultiWriter(os.Stdout, buf)
 		cmd.Stderr = io.MultiWriter(os.Stderr, buf)
 		cmd.Dir = p.Settings.Repo.WorkDir
@@ -209,4 +199,19 @@ func (p *Plugin) Execute(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// getEnvVars returns the environment variables for git commands.
+func (p *Plugin) getEnvVars() []string {
+	envVars := []string{
+		"GIT_LFS_SKIP_SMUDGE=1", // prevents git-lfs from retrieving any LFS files
+	}
+
+	if p.Settings.Home != "" {
+		if info, err := os.Stat(p.Settings.Home); err == nil && info.IsDir() {
+			envVars = append(envVars, fmt.Sprintf("HOME=%s", p.Settings.Home))
+		}
+	}
+
+	return envVars
 }
