@@ -96,26 +96,3 @@ func TestConfigRemapSubmodule(t *testing.T) {
 		})
 	}
 }
-
-func TestConfigSSHCommand(t *testing.T) {
-	tests := []struct {
-		name   string
-		repo   Repository
-		sshKey string
-		want   []string
-	}{
-		{
-			name:   "set SSH command with key",
-			repo:   Repository{},
-			sshKey: "/path/to/ssh/key",
-			want:   []string{gitBin, "config", "--global", "core.sshCommand", "ssh -i /path/to/ssh/key"},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cmd := tt.repo.ConfigSSHCommand(tt.sshKey)
-			assert.Equal(t, tt.want, cmd.Args)
-		})
-	}
-}

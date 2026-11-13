@@ -55,6 +55,44 @@ func (p *Plugin) Validate() error {
 		p.Settings.Repo.Filter = "tree:0"
 	}
 
+	if err := validateBranch(p.Settings.Repo.Branch); err != nil {
+		return err
+	}
+
+	if err := validateCommitRef(p.Settings.Repo.CommitRef); err != nil {
+		return err
+	}
+
+	if err := validateCommitSha(p.Settings.Repo.CommitSha); err != nil {
+		return err
+	}
+
+	if err := validateFilter(p.Settings.Repo.Filter); err != nil {
+		return err
+	}
+
+	if err := validateRemoteURL(p.Settings.Repo.RemoteURL); err != nil {
+		return err
+	}
+
+	if err := validateSafeDirectory(p.Settings.Repo.SafeDirectory); err != nil {
+		return err
+	}
+
+	if err := validateSSHKey(p.Settings.SSHKey); err != nil {
+		return err
+	}
+
+	if err := validateNetrc(p.Settings.Netrc); err != nil {
+		return err
+	}
+
+	for name, url := range p.Settings.Repo.Submodules {
+		if err := validateSubmodule(name, url); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -66,6 +104,13 @@ func (p *Plugin) Execute(ctx context.Context) error {
 	}
 
 	homeDir := plugin_util.GetUserHomeDir()
+
+	if p.Settings.Home != "" {
+		if info, err := os.Stat(p.Settings.Home); err == nil && info.IsDir() {
+			homeDir = p.Settings.Home
+		}
+	}
+
 	batchCmd := make([]*plugin_exec.Cmd, 0)
 
 	// Handle repo initialization.
@@ -86,10 +131,6 @@ func (p *Plugin) Execute(ctx context.Context) error {
 	if !isDir {
 		batchCmd = append(batchCmd, p.Settings.Repo.Init())
 		batchCmd = append(batchCmd, p.Settings.Repo.RemoteAdd())
-
-		if p.Settings.SSHKey != "" {
-			batchCmd = append(batchCmd, p.Settings.Repo.ConfigSSHCommand(p.Settings.SSHKey))
-		}
 	}
 
 	batchCmd = append(batchCmd, p.Settings.Repo.ConfigSSLVerify(network.InsecureSkipVerify))
@@ -97,6 +138,12 @@ func (p *Plugin) Execute(ctx context.Context) error {
 	netrc := p.Settings.Netrc
 	if err := WriteNetrc(homeDir, netrc.Machine, netrc.Login, netrc.Password); err != nil {
 		return err
+	}
+
+	if p.Settings.SSHKey != "" {
+		if err := WriteSSHConfig(homeDir, p.Settings.SSHKey); err != nil {
+			return err
+		}
 	}
 
 	// Handle clone
@@ -135,18 +182,8 @@ func (p *Plugin) Execute(ctx context.Context) error {
 
 		buf := new(bytes.Buffer)
 
-		// Don' set GIT_TERMINAL_PROMPT=0 as it prevents git from loading .netrc
-		defaultEnvVars := []string{
-			"GIT_LFS_SKIP_SMUDGE=1", // prevents git-lfs from retrieving any LFS files
-		}
-
-		if p.Settings.Home != "" {
-			if _, err := os.Stat(p.Settings.Home); !os.IsNotExist(err) {
-				defaultEnvVars = append(defaultEnvVars, fmt.Sprintf("HOME=%s", p.Settings.Home))
-			}
-		}
-
-		cmd.Env = append(os.Environ(), defaultEnvVars...)
+		// Don't set GIT_TERMINAL_PROMPT=0 as it prevents git from loading .netrc
+		cmd.Env = append(os.Environ(), p.getEnvVars()...)
 		cmd.Stdout = io.MultiWriter(os.Stdout, buf)
 		cmd.Stderr = io.MultiWriter(os.Stderr, buf)
 		cmd.Dir = p.Settings.Repo.WorkDir
@@ -162,4 +199,19 @@ func (p *Plugin) Execute(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// getEnvVars returns the environment variables for git commands.
+func (p *Plugin) getEnvVars() []string {
+	envVars := []string{
+		"GIT_LFS_SKIP_SMUDGE=1", // prevents git-lfs from retrieving any LFS files
+	}
+
+	if p.Settings.Home != "" {
+		if info, err := os.Stat(p.Settings.Home); err == nil && info.IsDir() {
+			envVars = append(envVars, fmt.Sprintf("HOME=%s", p.Settings.Home))
+		}
+	}
+
+	return envVars
 }

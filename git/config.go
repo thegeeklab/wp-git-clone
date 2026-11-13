@@ -22,7 +22,7 @@ func (r *Repository) ConfigSSLVerify(skipVerify bool) *plugin_exec.Cmd {
 	return cmd
 }
 
-// ConfigSafeDirectory disables globally the git ssl verification.
+// ConfigSafeDirectory sets a safe directory globally.
 func (r *Repository) ConfigSafeDirectory() *plugin_exec.Cmd {
 	args := []string{
 		"config",
@@ -46,21 +46,6 @@ func (r *Repository) ConfigRemapSubmodule(name, url string) *plugin_exec.Cmd {
 		"--global",
 		fmt.Sprintf("submodule.%s.url", name),
 		url,
-	}
-
-	cmd := plugin_exec.Command(gitBin, args...)
-	cmd.Trace = false
-
-	return cmd
-}
-
-// ConfigSSHCommand sets custom SSH key.
-func (r *Repository) ConfigSSHCommand(sshKey string) *plugin_exec.Cmd {
-	args := []string{
-		"config",
-		"--global",
-		"core.sshCommand",
-		"ssh -i " + sshKey,
 	}
 
 	cmd := plugin_exec.Command(gitBin, args...)

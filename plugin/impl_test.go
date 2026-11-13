@@ -26,41 +26,44 @@ type testCommit struct {
 // a fresh, empty directory every time.
 func TestClone(t *testing.T) {
 	for _, tt := range getCommits() {
-		dir := setup()
-		defer teardown(dir)
+		t.Run(tt.name, func(t *testing.T) {
+			dir := setup()
 
-		plugin := New(func(_ context.Context) error { return nil })
-		_ = plugin.App.Run(t.Context(), []string{"wp-git-clone"})
-		plugin.Settings = &Settings{
-			Repo: git.Repository{
-				RemoteURL: tt.clone,
-				CommitRef: tt.ref,
-				CommitSha: tt.commit,
-				Branch:    "main",
-				WorkDir:   filepath.Join(dir, tt.path),
-			},
-			Home:      "/tmp",
-			Recursive: tt.recursive,
-			Lfs:       tt.lfs,
-		}
+			t.Cleanup(func() { teardown(dir) })
 
-		if err := plugin.Execute(t.Context()); err != nil {
-			t.Errorf("Expected successful clone. Got error. %s.", err)
-		}
-
-		if tt.data != "" {
-			data := readFile(plugin.Settings.Repo.WorkDir, tt.file)
-			if data != tt.data {
-				t.Errorf("Expected %s to contain [%s]. Got [%s].", tt.file, tt.data, data)
+			plugin := New(func(_ context.Context) error { return nil })
+			_ = plugin.App.Run(t.Context(), []string{"wp-git-clone"})
+			plugin.Settings = &Settings{
+				Repo: git.Repository{
+					RemoteURL: tt.clone,
+					CommitRef: tt.ref,
+					CommitSha: tt.commit,
+					Branch:    "main",
+					WorkDir:   filepath.Join(dir, tt.path),
+				},
+				Home:      "/tmp",
+				Recursive: tt.recursive,
+				Lfs:       tt.lfs,
 			}
-		}
 
-		if tt.dataSize != 0 {
-			size := getFileSize(plugin.Settings.Repo.WorkDir, tt.file)
-			if size != tt.dataSize {
-				t.Errorf("Expected %s size to be [%d]. Got [%d].", tt.file, tt.dataSize, size)
+			if err := plugin.Execute(t.Context()); err != nil {
+				t.Errorf("Expected successful clone. Got error. %s.", err)
 			}
-		}
+
+			if tt.data != "" {
+				data := readFile(plugin.Settings.Repo.WorkDir, tt.file)
+				if data != tt.data {
+					t.Errorf("Expected %s to contain [%s]. Got [%s].", tt.file, tt.data, data)
+				}
+			}
+
+			if tt.dataSize != 0 {
+				size := getFileSize(plugin.Settings.Repo.WorkDir, tt.file)
+				if size != tt.dataSize {
+					t.Errorf("Expected %s size to be [%d]. Got [%d].", tt.file, tt.dataSize, size)
+				}
+			}
+		})
 	}
 }
 
